@@ -1,0 +1,43 @@
+Domain Rules:
+
+Editing Delivery Plan:
+Transport capacity cannot be exceeded:
+euro palette - defined for transport type,
+cages - size like palette, but 2 can be stocked,
+trailers - 10 in standard 22 palette transport size.
+
+Plan change recalculates plan completeness by taking into account:
+planed deliveries
+current demands in parts amount
+the remainder (not fulfilled demands for product from last plan)
+
+Completing the Plan:
+Before completion, plan should fulfill demands 100%,
+In other case, confirmation for each product need to be taken:
+confirm customer acceptance: „deliver part next day” or „reduce todays demand”
+the remainder is left for next plan accordingly
+Over planning to 1 full storage unit per transport is acceptable.
+After completing:
+Emails for spedition company with info (arrival time at our location, transport type, delivery location) per spedition company should be send.
+Loading Pick Lists and Schedule
+
+Auto Planning:
+Calculate storage units amount to be delivered based on:
+current product demands
+product preferences
+Group products delivered with single truck based on:
+same delivery location
+delivery schema / delivery time
+Splits deliveries
+demanded storage units amount
+transport capacity
+
+Preferences per product:
+storage units type
+parts amount per storage units
+typical delivery location
+typical transport time
+preferred spedition company
+preferred transport type
+
+Delivery schema example: „at day start”, „till 12:00”, „till end of day”, „night shift”

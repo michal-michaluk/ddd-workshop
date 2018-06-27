@@ -10,6 +10,10 @@ Feature: Editing Delivery Plan
   - current demands in parts amount
   - the remainder (not fulfilled demands for product from last plan)
 
+  Feasibility of the plan by taking into account:
+  - stock state
+  - planed deliveries
+
   Preferences per product:
   - storage units type
   - parts amount per storage units

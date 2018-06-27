@@ -29,7 +29,7 @@ Feature: Editing Delivery Plan
       | product | storage units |
       | 3009000 | 15            |
       | 3009001 | 10            |
-    Then Transport capacity in not exceeded
+    Then Transport capacity is not exceeded
     Then customers demands are fulfilled
 
 
@@ -40,7 +40,7 @@ Feature: Editing Delivery Plan
     When new delivery is planned at 07:00 with "truck (22)":
       | product | storage units |
       | 3009000 | 27            |
-    Then Transport capacity in exceeded
+    Then Transport capacity is exceeded
     Then customers demands are fulfilled
 
 
@@ -56,5 +56,5 @@ Feature: Editing Delivery Plan
     When new delivery is planned at 07:00 with "truck (22)":
       | product | storage units |
       | 3009000 | 5             |
-    Then Transport capacity in not exceeded
+    Then Transport capacity is not exceeded
     Then customers demands are fulfilled

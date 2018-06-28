@@ -28,39 +28,39 @@ Feature: Editing Delivery Plan
 
   Scenario: two products can fit single transport
     Given customers demands for tomorrow:
-      | product | amount | delivery schema |
-      | 3009000 | 2000   | at day start    |
-      | 3009001 | 2000   | at day start    |
-    When new delivery is planned at 07:00 with "truck (33)":
-      | product | storage units |
-      | 3009000 | 15            |
-      | 3009001 | 10            |
+      | product | amount | deliverySchema |
+      | 3009000 | 2000   | at day start   |
+      | 3009001 | 2000   | at day start   |
+    When new delivery is planned at 07:00 with truck of capacity 33:
+      | product | storageUnits |
+      | 3009000 | 15           |
+      | 3009001 | 10           |
     Then Transport capacity is not exceeded
     Then customers demands are fulfilled
 
 
   Scenario: delivery exceeded transport capacity
     Given customers demands for tomorrow:
-      | product | amount | delivery schema |
-      | 3009000 | 4000   | at day start    |
-    When new delivery is planned at 07:00 with "truck (22)":
-      | product | storage units |
-      | 3009000 | 27            |
+      | product | amount | deliverySchema |
+      | 3009000 | 4000   | at day start   |
+    When new delivery is planned at 07:00 with truck of capacity 22:
+      | product | storageUnits |
+      | 3009000 | 27           |
     Then Transport capacity is exceeded
     Then customers demands are fulfilled
 
 
   Scenario: products delivery with two transports
     Given customers demands for tomorrow:
-      | product | amount | delivery schema |
-      | 3009000 | 4000   | at day start    |
-    When new delivery is planned at 06:00 with "truck (22)":
-      | product | storage units |
-      | 3009000 | 22            |
+      | product | amount | deliverySchema |
+      | 3009000 | 4000   | at day start   |
+    When new delivery is planned at 06:00 with truck of capacity 22:
+      | product | storageUnits |
+      | 3009000 | 22           |
     Then Transport capacity in not exceeded
     Then customers demands are not fulfilled
-    When new delivery is planned at 07:00 with "truck (22)":
-      | product | storage units |
-      | 3009000 | 5             |
+    When new delivery is planned at 07:00 with truck of capacity 22:
+      | product | storageUnits |
+      | 3009000 | 5            |
     Then Transport capacity is not exceeded
     Then customers demands are fulfilled

@@ -13,6 +13,8 @@ Feature: Editing Delivery Plan
   Feasibility of the plan by taking into account:
   - stock state
   - planed deliveries
+  - production plan
+  all those information combined creates stock forecast
 
   Preferences per product:
   - storage units type

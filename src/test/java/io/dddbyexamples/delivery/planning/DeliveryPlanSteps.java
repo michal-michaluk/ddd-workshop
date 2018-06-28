@@ -1,87 +1,193 @@
 package io.dddbyexamples.delivery.planning;
 
-import cucumber.api.PendingException;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import lombok.Value;
+import io.dddbyexamples.delivery.planning.commands.EditDelivery;
+import io.dddbyexamples.delivery.planning.delivery.*;
+import io.dddbyexamples.delivery.planning.events.DeliveryChanged;
+import io.dddbyexamples.delivery.planning.events.DeliveryEvents;
+import io.dddbyexamples.delivery.planning.events.PlanningCompleted;
+import io.dddbyexamples.delivery.planning.plan.*;
+import lombok.Data;
+import org.assertj.core.api.Assertions;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DeliveryPlanSteps {
 
-    private Result result;
+    // objects under test
     private DeliveryPlan plan;
-    private int scheduledDeliveries;
+    private Map<Object, Delivery> deliveries = new HashMap<>();
+    private PlanCompleteness planCompleteness;
 
-    @Given("^(\\d+) pieces of product \"([^\"]*)\" are stored on \"([^\"]*)\"$")
-    public void piecesOfProductAreStoredOn(int amount, String productRefNo, String storageUnit) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
+    // dependencies
+    private CapacityPolicy capacityPolicy = new SimpleCapacityPolicy();
+    private CompletenessPolicy completenessPolicy = new SimpleCompletenessPolicy();
+    private DemandForecasting forecasting = change -> {
+    };
 
-    @Given("^customers demands for tomorrow:$")
-    public void customersDemandsForTomorrow(List<Demands> demands) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
+    // state
+    private Map<String, StorageUnit> storageUnits = new HashMap<>();
 
-    @When("^new delivery is scheduled at (\\d+:\\d+) with truck of capacity \\d+:$")
-    public void newDeliveryIsPlannedAtWith(String time, int transportCapacity, List<TransportedProduct> content) throws Throwable {
-        plan = new DeliveryPlan(new ArrayList<>());
+    // consequences
+    private Amounts exceeded = Amounts.empty();
+    private DeliveryEvents events = createEventsListener();
+    private DeliveryChanged planChanged;
+    private PlanningCompleted planCompleted;
 
-        scheduledDeliveries = plan.getDeliveries().size();
-        result = plan.scheduleDelivery(
-                new ScheduleDelivery(time, transportCapacity, content)
+    @Before
+    public void setUp() throws Exception {
+        plan = new DeliveryPlan(
+                UUID.randomUUID(), planCompleteness, forecasting, completenessPolicy, events
         );
     }
 
-    @Then("^new delivery was scheduled$")
-    public void newDeliveryWasScheduled() throws Throwable {
-        // check internal plan state
-        assertThat(plan.getDeliveries())
-                .hasSize(scheduledDeliveries + 1);
-        // or check event was emitted
+    @Given("^(\\d+) pieces of product \"([^\"]*)\" are stored on \"([^\"]*)\"$")
+    public void piecesOfProductAreStoredOn(int amount, String refNo, String storageUnitType) throws Throwable {
+        storageUnits.put(refNo, new StorageUnit(storageUnitType, amount));
     }
 
-    @Then("^new delivery was not scheduled$")
-    public void newDeliveryWasNotScheduled() throws Throwable {
-        assertThat(plan.getDeliveries())
-                .hasSize(scheduledDeliveries);
+    @Given("^customers demands for tomorrow:$")
+    public void customersDemandsForTomorrow(List<ExpectedDemand> demands) throws Throwable {
+        Amounts todayDemands = new Amounts(demands.stream().collect(Collectors.toMap(
+                ExpectedDemand::getProduct,
+                ExpectedDemand::getAmount
+        )));
+        this.planCompleteness = new PlanCompleteness(
+                LocalDate.now(), Amounts.empty(), todayDemands, Amounts.empty()
+        );
     }
 
-    @Then("^Transport capacity is exceeded$")
-    public void transportCapacityIsExceeded() throws Throwable {
-        assertThat(result.isCapacityIsExceeded())
-                .isTrue();
+    @When("^new delivery is scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
+    public void newDeliveryIsPlannedAtWith(String time, String transportType,
+                                           int transportCapacity, List<DeliveryPayload> payload) throws Throwable {
+        String id = "transport at " + time;
+        Assertions.assertThat(deliveries).doesNotContainKeys(id);
+        Delivery object = createNewDelivery(id);
+        EditDelivery command = createCommand(id,
+                time,
+                transportType,
+                transportCapacity,
+                payload
+        );
+        exceeded = object.editDelivery(command);
+    }
+
+    @When("^new delivery \"([^\"]*)\" is scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
+    public void newDeliveryIsPlannedAtWith(String id,
+                                           String time, String transportType,
+                                           int transportCapacity,
+                                           List<DeliveryPayload> payload) throws Throwable {
+        Delivery object = createNewDelivery(id);
+        EditDelivery command = createCommand(id,
+                time,
+                transportType,
+                transportCapacity,
+                payload
+        );
+        exceeded = object.editDelivery(command);
+    }
+
+    @When("^edit delivery \"([^\"]*)\" schedule at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
+    public void editDeliveryIsPlannedAtWith(String id,
+                                            String time, String transportType,
+                                            int transportCapacity,
+                                            List<DeliveryPayload> payload) throws Throwable {
+        EditDelivery command = createCommand(id, time, transportType, transportCapacity, payload);
+        exceeded = deliveries.get(id).editDelivery(command);
+    }
+
+    private Delivery createNewDelivery(String id) {
+        Delivery object = new Delivery(id, capacityPolicy, events);
+        deliveries.put(id, object);
+        return object;
+    }
+
+    private EditDelivery createCommand(String id, String time, String transportType, int transportCapacity, List<DeliveryPayload> payload) {
+        return new EditDelivery(id,
+                LocalDateTime.of(
+                        LocalDate.now().plusDays(1),
+                        LocalTime.parse(time)
+                ),
+                new TransportType(transportType, transportCapacity),
+                Payload.create(payload.stream().collect(Collectors.toMap(
+                        DeliveryPayload::getProduct,
+                        DeliveryPayload::getStorageUnits
+                )), storageUnits));
     }
 
     @Then("^Transport capacity is not exceeded$")
-    public void transportCapacityIsNotExceeded() throws Throwable {
-        assertThat(result.isCapacityIsExceeded())
-                .isFalse();
+    public void transportCapacityInNotExceeded() throws Throwable {
+        assertThat(exceeded.isEmpty()).isTrue();
+    }
+
+    @Then("^Transport capacity is exceeded$")
+    public void transportCapacityInExceeded() throws Throwable {
+        assertThat(exceeded.isEmpty()).isFalse();
     }
 
     @Then("^customers demands are fulfilled$")
     public void customersDemandsAreFulfilled() throws Throwable {
-        assertThat(result.isDemandsAreFulfilled())
-                .isTrue();
+        assertThat(isDemandsFulfilled()).isTrue();
     }
 
     @Then("^customers demands are not fulfilled$")
     public void customersDemandsAreNotFulfilled() throws Throwable {
-        assertThat(result.isDemandsAreFulfilled())
-                .isFalse();
+        assertThat(isDemandsFulfilled()).isFalse();
     }
 
-    @Value
-    public static class Demands {
-        String product;
-        int amount;
-        String deliverySchema;
+    @Then("^new delivery was scheduled$")
+    public void newDeliveryWasScheduled() throws Throwable {
+        assertThat(planChanged).isNotNull();
     }
 
+    @Then("^new delivery was not scheduled$")
+    public void newDeliveryWasNotScheduled() throws Throwable {
+        assertThat(planChanged).isNull();
+    }
+
+    private boolean isDemandsFulfilled() {
+        return planCompleteness.getDiff()
+                .allMatch((refNo, amount) -> amount >= 0L);
+    }
+
+    private DeliveryEvents createEventsListener() {
+        return new DeliveryEvents() {
+            @Override
+            public void emit(DeliveryChanged event) {
+                planChanged = event;
+                planCompleteness.apply(event);
+            }
+
+            @Override
+            public void emit(PlanningCompleted event) {
+                planCompleted = event;
+
+            }
+        };
+    }
+
+    @Data
+    static class ExpectedDemand {
+        private String product;
+        private long amount;
+        private String deliverySchema;
+    }
+
+    @Data
+    static class DeliveryPayload {
+        private String product;
+        private int storageUnits;
+    }
 }

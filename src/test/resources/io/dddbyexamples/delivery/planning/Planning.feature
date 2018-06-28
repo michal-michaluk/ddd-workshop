@@ -31,7 +31,7 @@ Feature: Editing Delivery Plan
       | product | amount | deliverySchema |
       | 3009000 | 2000   | at day start   |
       | 3009001 | 2000   | at day start   |
-    When new delivery is scheduled at 07:00 with truck of capacity 33:
+    When new delivery is scheduled at "07:00" with "truck" of capacity 33:
       | product | storageUnits |
       | 3009000 | 15           |
       | 3009001 | 10           |
@@ -44,24 +44,24 @@ Feature: Editing Delivery Plan
     Given customers demands for tomorrow:
       | product | amount | deliverySchema |
       | 3009000 | 4000   | at day start   |
-    When new delivery is scheduled at 07:00 with truck of capacity 22:
+    When new delivery is scheduled at "07:00" with "truck" of capacity 22:
       | product | storageUnits |
       | 3009000 | 27           |
     Then new delivery was not scheduled
     Then Transport capacity is exceeded
-    Then customers demands are fulfilled
+    Then customers demands are not fulfilled
 
 
   Scenario: products delivery with two transports
     Given customers demands for tomorrow:
       | product | amount | deliverySchema |
       | 3009000 | 4000   | at day start   |
-    When new delivery is scheduled at 06:00 with truck of capacity 22:
+    When new delivery is scheduled at "06:00" with "truck" of capacity 22:
       | product | storageUnits |
       | 3009000 | 22           |
     Then Transport capacity is not exceeded
     Then customers demands are not fulfilled
-    When new delivery is scheduled at 07:00 with truck of capacity 22:
+    When new delivery is scheduled at "07:00" with "truck" of capacity 22:
       | product | storageUnits |
       | 3009000 | 5            |
     Then new delivery was scheduled

@@ -1,11 +1,11 @@
-package io.dddbyexamples.delivery.planning;
+package io.dddbyexamples.delivery.planning.naiveimpl;
 
 import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 @AllArgsConstructor
-class DeliveryPlan {
+public class DeliveryPlan {
 
     private List<Object> deliveries;
 

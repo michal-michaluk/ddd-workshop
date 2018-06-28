@@ -1,4 +1,4 @@
-package io.dddbyexamples.delivery.planning;
+package io.dddbyexamples.delivery.planning.naiveimpl;
 
 import lombok.Value;
 

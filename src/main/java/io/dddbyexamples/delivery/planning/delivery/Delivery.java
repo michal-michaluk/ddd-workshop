@@ -4,7 +4,6 @@ import io.dddbyexamples.delivery.planning.Amounts;
 import io.dddbyexamples.delivery.planning.commands.EditDelivery;
 import io.dddbyexamples.delivery.planning.events.DeliveryChanged;
 import io.dddbyexamples.delivery.planning.events.DeliveryEvents;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -14,12 +13,12 @@ public class Delivery {
     private TransportType type;
     private Payload payload;
 
-    private CapacityPolicy capacityPolicy;
+    private PayloadCapacityPolicy payloadCapacityPolicy;
     private DeliveryEvents events;
 
-    public Delivery(String id, CapacityPolicy capacityPolicy, DeliveryEvents events) {
+    public Delivery(String id, PayloadCapacityPolicy payloadCapacityPolicy, DeliveryEvents events) {
         this.id = id;
-        this.capacityPolicy = capacityPolicy;
+        this.payloadCapacityPolicy = payloadCapacityPolicy;
         this.events = events;
         time = LocalDateTime.MIN;
         type = TransportType.unspecified();
@@ -27,7 +26,7 @@ public class Delivery {
     }
 
     public Amounts editDelivery(EditDelivery command) {
-        Amounts exceeded = capacityPolicy.calculateExceeded(
+        Amounts exceeded = payloadCapacityPolicy.calculateExceeded(
                 command.getType(),
                 command.getPayload().amountOfUnitTypes()
         );

@@ -12,7 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DeliveryFactory {
 
-    private CapacityPolicy capacityPolicy;
+    private PayloadCapacityPolicy payloadCapacityPolicy;
     private DeliveryEvents events;
 
     public Optional<Delivery> scheduleDelivery(
@@ -23,7 +23,7 @@ public class DeliveryFactory {
         String id = UUID.randomUUID().toString();
         Delivery delivery = new Delivery(
                 id,
-                capacityPolicy, events
+                payloadCapacityPolicy, events
         );
         Amounts exceeded = delivery.editDelivery(new EditDelivery(id, time, type, payload));
 

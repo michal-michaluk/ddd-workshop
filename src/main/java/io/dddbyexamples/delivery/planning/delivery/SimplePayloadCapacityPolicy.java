@@ -2,7 +2,7 @@ package io.dddbyexamples.delivery.planning.delivery;
 
 import io.dddbyexamples.delivery.planning.Amounts;
 
-public class SimpleCapacityPolicy implements CapacityPolicy {
+public class SimplePayloadCapacityPolicy implements PayloadCapacityPolicy {
 
     @Override
     public Amounts calculateExceeded(TransportType type, Amounts amounts) {

@@ -32,7 +32,7 @@ public class DeliveryPlanSteps {
     private PlanCompleteness planCompleteness;
 
     // dependencies
-    private CapacityPolicy capacityPolicy = new SimpleCapacityPolicy();
+    private PayloadCapacityPolicy payloadCapacityPolicy = new SimplePayloadCapacityPolicy();
     private CompletenessPolicy completenessPolicy = new SimpleCompletenessPolicy();
     private DemandForecasting forecasting = change -> {
     };
@@ -109,7 +109,7 @@ public class DeliveryPlanSteps {
     }
 
     private Delivery createNewDelivery(String id) {
-        Delivery object = new Delivery(id, capacityPolicy, events);
+        Delivery object = new Delivery(id, payloadCapacityPolicy, events);
         deliveries.put(id, object);
         return object;
     }

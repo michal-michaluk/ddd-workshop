@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DeliveryPlanSteps {
+public class DeliveryModificationsSteps {
 
     // objects under test
     private DeliveryPlan plan;

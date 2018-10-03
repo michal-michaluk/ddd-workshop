@@ -1,2 +1,2 @@
-# ddd-workshop
-Materials for our DDD training
+# receptury-extensible-design
+Materials for our training

@@ -18,6 +18,13 @@ Feature: Payload capacity policy
     Then capacity is not exceeded
 
 
+  Scenario: Full truck, one pallet over capacity
+    Given "truck" of capacity 22
+    Given payload contains 23 palette
+    When Capacity Policy is checked
+    Then capacity is exceeded with 1 palette
+
+
   Scenario Outline: Verify payload capacity policy
     Given "<transport>" of capacity <capacity>
     Given payload contains <palette> palette
@@ -103,6 +110,7 @@ Feature: Payload capacity policy
       | truck     | 22       | 0       | 0     | 12       | 0           | 0         | 2            |
 
       # that truck not support trailers
+      | truck     | 10       | 0       | 0     | 1        | 0           | 0         | 1            |
       | truck     | 10       | 0       | 0     | 9        | 0           | 0         | 9            |
       | truck     | 10       | 0       | 0     | 10       | 0           | 0         | 10           |
       | truck     | 10       | 0       | 0     | 11       | 0           | 0         | 11           |

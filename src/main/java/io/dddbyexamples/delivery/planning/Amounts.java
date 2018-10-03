@@ -42,7 +42,7 @@ public class Amounts {
         );
     }
 
-    private long get(String key) {
+    public long get(String key) {
         return amounts.getOrDefault(key, 0L);
     }
 

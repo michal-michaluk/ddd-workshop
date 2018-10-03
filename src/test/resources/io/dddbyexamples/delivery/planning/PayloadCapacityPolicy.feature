@@ -63,10 +63,10 @@ Feature: Payload capacity policy
       # full payload:
       | truck     | 10       | 10      | 0     | 0        | 0           | 0         | 0            |
       | truck     | 10       | 0       | 20    | 0        | 0           | 0         | 0            |
-      | truck     | 10       | 0       | 0     | 5        | 0           | 0         | 0            |
+      | truck     | 10       | 0       | 0     | 5        | 0           | 0         | 5            |
 
       # capacity exceeded with mixed types:
-      | truck     | 10       | 10      | 2     | 0        | 4           | 2         | 0            |
+      | truck     | 10       | 10      | 2     | 0        | 1           | 2         | 0            |
 
       # trailers are not mixable with other storage units
       | truck     | 22       | 2       | 0     | 3        | 2           | 0         | 3            |
@@ -80,7 +80,7 @@ Feature: Payload capacity policy
       # capacity exceeded:
       | truck     | 10       | 11      | 0     | 0        | 1           | 0         | 0            |
       | truck     | 10       | 0       | 21    | 0        | 0           | 1         | 0            |
-      | truck     | 10       | 0       | 0     | 6        | 0           | 0         | 1            |
+      | truck     | 10       | 0       | 0     | 6        | 0           | 0         | 6            |
 
 
   Scenario Outline: 2 cages can be stacked on each other

@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions;
 
 public class PayloadCapacityPolicySteps {
 
-    PayloadCapacityPolicy policy = new PayloadCapacityPolicyVer1();
+    private PayloadCapacityPolicy policy = new PayloadCapacityPolicyVer1();
 
     private TransportType type;
     private Amounts amounts = Amounts.empty();

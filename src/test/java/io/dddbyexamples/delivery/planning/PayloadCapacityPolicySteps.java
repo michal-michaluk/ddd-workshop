@@ -1,6 +1,5 @@
 package io.dddbyexamples.delivery.planning;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -14,7 +13,7 @@ public class PayloadCapacityPolicySteps {
     PayloadCapacityPolicy policy = new PayloadCapacityPolicyVer1();
 
     private TransportType type;
-    private Amounts amounts;
+    private Amounts amounts = Amounts.empty();
 
     private Amounts exceededAmount;
 
@@ -25,7 +24,7 @@ public class PayloadCapacityPolicySteps {
 
     @Given("^payload contains (\\d+) palette$")
     public void payloadContainsPalette(long amount) throws Throwable {
-        amounts = Amounts.of("palette", amount);
+        amounts = amounts.sum(Amounts.of("palette", amount));
     }
 
     @When("^Capacity Policy is checked$")
@@ -40,15 +39,13 @@ public class PayloadCapacityPolicySteps {
     }
 
     @Given("^payload contains (\\d+) cages$")
-    public void payloadContainsCagesCages(int arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    public void payloadContainsCagesCages(long amount) throws Throwable {
+        amounts = amounts.sum(Amounts.of("cages", amount));
     }
 
     @Given("^payload contains (\\d+) trailers$")
-    public void payloadContainsTrailersTrailers(int arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    public void payloadContainsTrailersTrailers(long amount) throws Throwable {
+        amounts = amounts.sum(Amounts.of("trailers", amount));
     }
 
     @Then("^capacity is exceeded with (\\d+) palette$")
@@ -58,14 +55,14 @@ public class PayloadCapacityPolicySteps {
     }
 
     @Then("^capacity is exceeded with (\\d+) cages$")
-    public void capacityIsExceededWithOverCagesCages(int arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    public void capacityIsExceededWithOverCagesCages(int amount) throws Throwable {
+        Assertions.assertThat(exceededAmount.get("cages"))
+                .isEqualTo(amount);
     }
 
     @Then("^capacity is exceeded with (\\d+) trailers$")
-    public void capacityIsExceededWithOverTrailersTrailers(int arg0) throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    public void capacityIsExceededWithOverTrailersTrailers(int amount) throws Throwable {
+        Assertions.assertThat(exceededAmount.get("trailers"))
+                .isEqualTo(amount);
     }
 }

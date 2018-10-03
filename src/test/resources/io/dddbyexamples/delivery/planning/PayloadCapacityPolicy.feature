@@ -25,6 +25,24 @@ Feature: Payload capacity policy
     Then capacity is exceeded with 1 palette
 
 
+  Scenario Outline: scenarios for palettes
+    Given "<transport>" of capacity <capacity>
+    Given payload contains <palette> palette
+    When Capacity Policy is checked
+    Then capacity is exceeded with <overPallets> palette
+
+    Examples:
+      | transport | capacity | palette | overPallets |
+      | truck     | 22       | 10      | 0           |
+      | truck     | 22       | 22      | 0           |
+      | truck     | 22       | 23      | 1           |
+      | truck     | 22       | 25      | 3           |
+      | truck     | 33       | 25      | 0           |
+      | truck     | 33       | 32      | 0           |
+      | truck     | 33       | 33      | 0           |
+      | truck     | 33       | 35      | 2           |
+
+
   Scenario Outline: Verify payload capacity policy
     Given "<transport>" of capacity <capacity>
     Given payload contains <palette> palette

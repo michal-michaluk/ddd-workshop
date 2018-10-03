@@ -1,6 +1,5 @@
-package io.dddbyexamples.delivery.planning.events;
+package io.dddbyexamples.delivery.planning;
 
-import io.dddbyexamples.delivery.planning.Amounts;
 import lombok.Value;
 
 @Value

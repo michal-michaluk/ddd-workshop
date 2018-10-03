@@ -1,9 +1,8 @@
 package io.dddbyexamples.delivery.planning.delivery;
 
 import io.dddbyexamples.delivery.planning.Amounts;
-import io.dddbyexamples.delivery.planning.commands.EditDelivery;
-import io.dddbyexamples.delivery.planning.events.DeliveryChanged;
-import io.dddbyexamples.delivery.planning.events.DeliveryEvents;
+import io.dddbyexamples.delivery.planning.DeliveredAmountsChanged;
+import io.dddbyexamples.delivery.planning.DeliveryEvents;
 
 import java.time.LocalDateTime;
 
@@ -42,16 +41,20 @@ public class Delivery {
         this.payload = command.getPayload();
 
         if (!diff.isEmpty()) {
-            events.emit(new DeliveryChanged(id, diff));
+            events.emit(new DeliveredAmountsChanged(id, diff));
         }
         return Amounts.empty();
     }
 
-    public void cancelDelivery() {
+    public void clearDelivery() {
         Amounts diff = this.payload.amountOfProducts().negative();
         this.type = TransportType.unspecified();
         this.payload = Payload.empty();
-        events.emit(new DeliveryChanged(id, diff));
+        events.emit(new DeliveredAmountsChanged(id, diff));
+    }
+
+    public Object getId() {
+        return id;
     }
 
     private boolean capacity(Amounts exceeded) {

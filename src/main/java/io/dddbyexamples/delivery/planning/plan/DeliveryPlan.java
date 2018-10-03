@@ -1,9 +1,8 @@
 package io.dddbyexamples.delivery.planning.plan;
 
 import io.dddbyexamples.delivery.planning.Amounts;
-import io.dddbyexamples.delivery.planning.commands.CompletePlan;
-import io.dddbyexamples.delivery.planning.events.DeliveryEvents;
-import io.dddbyexamples.delivery.planning.events.PlanningCompleted;
+import io.dddbyexamples.delivery.planning.DeliveryEvents;
+import io.dddbyexamples.delivery.planning.PlanningCompleted;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -15,7 +14,7 @@ public class DeliveryPlan {
     private CompletenessPolicy policy;
     private DeliveryEvents events;
 
-    void complete(CompletePlan command) {
+    void Complete(CompletePlan command) {
         Amounts demandsDiff = planCompleteness.getDiff();
         if (!policy.fulfills(demandsDiff, command)) {
             return;
@@ -26,4 +25,5 @@ public class DeliveryPlan {
         Amounts reminder = demandsDiff.filter(command.decisionToDeliverDiffNextDay());
         events.emit(new PlanningCompleted(id, reminder));
     }
+
 }

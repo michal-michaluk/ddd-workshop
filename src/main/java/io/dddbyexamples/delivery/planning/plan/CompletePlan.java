@@ -1,4 +1,4 @@
-package io.dddbyexamples.delivery.planning.commands;
+package io.dddbyexamples.delivery.planning.plan;
 
 import lombok.Value;
 

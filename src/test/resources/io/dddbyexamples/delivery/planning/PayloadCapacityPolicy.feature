@@ -1,14 +1,20 @@
 Feature: Payload capacity policy
 
-  Transport capacity cannot be exceeded:
-  euro palette - defined for transport type,
-  cages - size like palette, but 2 can be stocked,
-  trailers - 10 in standard 22 palette transport size.
+  Transport Capacity info:
+  each transport type (truck etc.) defines its capacity expressed by
+  amount of euro palette fitting in it.
+
+  There are 3 different types of Storage Units:
+  *euro palette* - capacity defined explicitly for transport type,
+  *cages* - with same size like euro palette, but two cages can be stocked one on another,
+  so for transport with capacity od 22 euro pallets we can fit 44 cages,
+  *trailers* - 10 trailers can be transported in standard 22 palette transport size,
+  no other transport types are leveraged for trailers delivery.
 
   Scenario: Full truck
     Given "truck" of capacity 22
     Given payload contains 22 palette
-    When simple Capacity Policy is checked
+    When Capacity Policy is checked
     Then capacity is not exceeded
 
 
@@ -17,7 +23,7 @@ Feature: Payload capacity policy
     Given payload contains <palette> palette
     Given payload contains <cages> cages
     Given payload contains <trailers> trailers
-    When simple Capacity Policy is checked
+    When Capacity Policy is checked
     Then capacity is exceeded with <overPallets> palette
     Then capacity is exceeded with <overCages> cages
     Then capacity is exceeded with <overTrailers> trailers
@@ -56,7 +62,7 @@ Feature: Payload capacity policy
     Given "truck" of capacity <capacity>
     Given payload contains <palette> palette
     Given payload contains <cages> cages
-    When simple Capacity Policy is checked
+    When Capacity Policy is checked
     Then capacity is exceeded with <overPallets> palette
     Then capacity is exceeded with <overCages> cages
 
@@ -84,7 +90,7 @@ Feature: Payload capacity policy
     Given payload contains <palette> palette
     Given payload contains <cages> cages
     Given payload contains <trailers> trailers
-    When simple Capacity Policy is checked
+    When Capacity Policy is checked
     Then capacity is exceeded with <overPallets> palette
     Then capacity is exceeded with <overCages> cages
     Then capacity is exceeded with <overTrailers> trailers

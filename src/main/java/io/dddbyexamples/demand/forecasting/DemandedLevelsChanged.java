@@ -1,4 +1,4 @@
-package io.dddbyexamples.delivery.planning.events;
+package io.dddbyexamples.demand.forecasting;
 
 import lombok.Value;
 

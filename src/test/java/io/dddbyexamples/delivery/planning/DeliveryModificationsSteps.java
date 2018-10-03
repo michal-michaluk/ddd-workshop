@@ -4,11 +4,7 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import io.dddbyexamples.delivery.planning.commands.EditDelivery;
 import io.dddbyexamples.delivery.planning.delivery.*;
-import io.dddbyexamples.delivery.planning.events.DeliveryChanged;
-import io.dddbyexamples.delivery.planning.events.DeliveryEvents;
-import io.dddbyexamples.delivery.planning.events.PlanningCompleted;
 import io.dddbyexamples.delivery.planning.plan.*;
 import lombok.Data;
 import org.assertj.core.api.Assertions;
@@ -43,7 +39,7 @@ public class DeliveryModificationsSteps {
     // consequences
     private Amounts exceeded = Amounts.empty();
     private DeliveryEvents events = createEventsListener();
-    private DeliveryChanged planChanged;
+    private DeliveredAmountsChanged planChanged;
     private PlanningCompleted planCompleted;
 
     @Before
@@ -67,6 +63,22 @@ public class DeliveryModificationsSteps {
         this.planCompleteness = new PlanCompleteness(
                 LocalDate.now(), Amounts.empty(), todayDemands, Amounts.empty()
         );
+    }
+
+    @Given("^delivery \"([^\"]*)\" scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
+    public void deliveryWasScheduledAtWithOfCapacity(String id,
+                                                     String time, String transportType,
+                                                     int transportCapacity,
+                                                     List<DeliveryPayload> payload) throws Throwable {
+        Delivery object = createNewDelivery(id);
+        EditDelivery command = createCommand(id,
+                time,
+                transportType,
+                transportCapacity,
+                payload
+        );
+        object.editDelivery(command);
+        planChanged = null;
     }
 
     @When("^new delivery is scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
@@ -99,7 +111,7 @@ public class DeliveryModificationsSteps {
         exceeded = object.editDelivery(command);
     }
 
-    @When("^edit delivery \"([^\"]*)\" schedule at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
+    @When("^delivery \"([^\"]*)\" is edited: scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
     public void editDeliveryIsPlannedAtWith(String id,
                                             String time, String transportType,
                                             int transportCapacity,
@@ -108,7 +120,13 @@ public class DeliveryModificationsSteps {
         exceeded = deliveries.get(id).editDelivery(command);
     }
 
+    @When("^delivery \"([^\"]*)\" is cancelled$")
+    public void deliveryIsCancelled(String id) throws Throwable {
+        deliveries.get(id).clearDelivery();
+    }
+
     private Delivery createNewDelivery(String id) {
+        new DeliveryFactory(payloadCapacityPolicy, events);
         Delivery object = new Delivery(id, payloadCapacityPolicy, events);
         deliveries.put(id, object);
         return object;
@@ -147,12 +165,12 @@ public class DeliveryModificationsSteps {
         assertThat(isDemandsFulfilled()).isFalse();
     }
 
-    @Then("^new delivery was scheduled$")
+    @Then("^plan was changed$")
     public void newDeliveryWasScheduled() throws Throwable {
         assertThat(planChanged).isNotNull();
     }
 
-    @Then("^new delivery was not scheduled$")
+    @Then("^plan was NOT changed$")
     public void newDeliveryWasNotScheduled() throws Throwable {
         assertThat(planChanged).isNull();
     }
@@ -165,7 +183,7 @@ public class DeliveryModificationsSteps {
     private DeliveryEvents createEventsListener() {
         return new DeliveryEvents() {
             @Override
-            public void emit(DeliveryChanged event) {
+            public void emit(DeliveredAmountsChanged event) {
                 planChanged = event;
                 planCompleteness.apply(event);
             }

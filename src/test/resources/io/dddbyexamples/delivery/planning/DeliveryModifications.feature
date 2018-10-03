@@ -1,24 +1,34 @@
 Feature: Editing Delivery Plan
 
-  Transport capacity cannot be exceeded:
-  euro palette - defined for transport type,
-  cages - size like palette, but 2 can be stocked,
-  trailers - 10 in standard 22 palette transport size.
+  At end of his work day (around 16:00), Logistician prepares delivery plan
+  for next day (plan include night shift of next day).
+  Plan for today (including night shift) was prepared day before.
 
+  Software supports Logistician while planning, by:
+  - checking payload size against Transport Capacity (capacity exceeded),
+  - continuously checking Plan Completeness against customers demands for that day.
+
+  Transport Capacity info:
+  each transport type (truck etc.) defines its capacity expressed by
+  amount of euro palette fitting in it.
+
+  There are 3 different types of Storage Units:
+  *euro palette* - capacity defined explicitly for transport type,
+  *cages* - with same size like euro palette, but two cages can be stocked one on another,
+  so for transport with capacity od 22 euro pallets we can fit 44 cages,
+  *trailers* - 10 trailers can be transported in standard 22 palette transport size,
+  no other transport types are leveraged for trailers delivery.
+
+  Completeness against:
   Plan change recalculates plan completeness by taking into account:
-  - planed deliveries
-  - current demands in parts amount
-  - the remainder (not fulfilled demands for product from last plan)
+  - currently planed deliveries,
+  - current demands expressed in parts amount,
+  - the remainder (not fulfilled demands for product from last plan).
 
-  Feasibility of the plan by taking into account:
-  - stock state
-  - planed deliveries
-  - production plan
-  all those information combined creates stock forecast
-
-  Preferences per product:
-  - storage units type
-  - parts amount per storage units
+  For each Product following information is configurable:
+  - preferred transport type and its capacity,
+  - storage units used for storage and transport,
+  - amount of product per storage unit.
 
 
   Background:
@@ -35,9 +45,9 @@ Feature: Editing Delivery Plan
       | product | storageUnits |
       | 3009000 | 15           |
       | 3009001 | 10           |
-    Then new delivery was scheduled
-    Then Transport capacity is not exceeded
-    Then customers demands are fulfilled
+    Then plan was changed
+    And Transport capacity is not exceeded
+    And customers demands are fulfilled
 
 
   Scenario: delivery exceeded transport capacity
@@ -47,9 +57,9 @@ Feature: Editing Delivery Plan
     When new delivery is scheduled at "07:00" with "truck" of capacity 22:
       | product | storageUnits |
       | 3009000 | 27           |
-    Then new delivery was not scheduled
-    Then Transport capacity is exceeded
-    Then customers demands are not fulfilled
+    Then plan was NOT changed
+    And Transport capacity is exceeded
+    And customers demands are not fulfilled
 
 
   Scenario: products delivery with two transports
@@ -64,6 +74,39 @@ Feature: Editing Delivery Plan
     When new delivery is scheduled at "07:00" with "truck" of capacity 22:
       | product | storageUnits |
       | 3009000 | 5            |
-    Then new delivery was scheduled
-    Then Transport capacity is not exceeded
-    Then customers demands are fulfilled
+    Then plan was changed
+    And Transport capacity is not exceeded
+    And customers demands are fulfilled
+
+
+  Scenario: editing previously defined delivery
+    Given customers demands for tomorrow:
+      | product | amount | deliverySchema |
+      | 3009000 | 2000   | at day start   |
+      | 3009001 | 2000   | at day start   |
+    Given delivery "delivery #1" scheduled at "07:00" with "truck" of capacity 33:
+      | product | storageUnits |
+      | 3009001 | 10           |
+    And customers demands are not fulfilled
+    When delivery "delivery #1" is edited: scheduled at "07:00" with "truck" of capacity 33:
+      | product | storageUnits |
+      | 3009000 | 15           |
+      | 3009001 | 10           |
+    Then plan was changed
+    And Transport capacity is not exceeded
+    And customers demands are fulfilled
+
+
+  Scenario: canceling previously defined delivery
+    Given customers demands for tomorrow:
+      | product | amount | deliverySchema |
+      | 3009000 | 2000   | at day start   |
+      | 3009001 | 2000   | at day start   |
+    Given delivery "delivery #1" scheduled at "07:00" with "truck" of capacity 33:
+      | product | storageUnits |
+      | 3009001 | 10           |
+      | 3009000 | 15           |
+    And customers demands are fulfilled
+    When delivery "delivery #1" is cancelled
+    Then plan was changed
+    And customers demands are not fulfilled

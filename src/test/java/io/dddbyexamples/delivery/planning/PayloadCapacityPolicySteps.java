@@ -19,8 +19,8 @@ public class PayloadCapacityPolicySteps {
         throw new PendingException();
     }
 
-    @When("^simple Capacity Policy is checked$")
-    public void simpleCapacityPolicyIsChecked() throws Throwable {
+    @When("^Capacity Policy is checked$")
+    public void capacityPolicyIsChecked() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
         throw new PendingException();
     }

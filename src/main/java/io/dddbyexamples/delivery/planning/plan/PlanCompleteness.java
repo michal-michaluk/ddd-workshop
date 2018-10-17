@@ -2,6 +2,7 @@ package io.dddbyexamples.delivery.planning.plan;
 
 import io.dddbyexamples.delivery.planning.Amounts;
 import io.dddbyexamples.delivery.planning.DeliveredAmountsChanged;
+import io.dddbyexamples.delivery.planning.PlanningCompleted;
 import io.dddbyexamples.demand.forecasting.DemandedLevelsChanged;
 import lombok.AllArgsConstructor;
 
@@ -18,7 +19,18 @@ public class PlanCompleteness {
         return planned.diff(demanded.sum(yesterdaysReminder));
     }
 
+    public Amounts getPlanned() {
+        return planned;
+    }
+
+    public boolean anyMissing() {
+        return !getDiff().allMatch((productRefNo, amount) -> amount > 0);
+    }
+
     public void apply(DeliveredAmountsChanged event) {
+        if (!event.getDate().equals(date)) {
+            return;
+        }
         planned = planned.sum(event.getDiff());
     }
 
@@ -26,11 +38,13 @@ public class PlanCompleteness {
         if (!event.getDate().equals(date)) {
             return;
         }
-        Amounts diff = Amounts.of(
-                event.getRefNo(),
-                event.getCurrent() - event.getPrevious()
-        );
-        demanded = demanded.sum(diff);
+        demanded = demanded.with(event.getRefNo(), event.getCurrent());
     }
 
+    public void apply(PlanningCompleted event) {
+        if (!event.getDate().equals(date.minusDays(1))) {
+            return;
+        }
+        yesterdaysReminder = yesterdaysReminder.sum(event.getReminder());
+    }
 }

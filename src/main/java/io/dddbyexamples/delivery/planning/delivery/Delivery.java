@@ -3,11 +3,13 @@ package io.dddbyexamples.delivery.planning.delivery;
 import io.dddbyexamples.delivery.planning.Amounts;
 import io.dddbyexamples.delivery.planning.DeliveredAmountsChanged;
 import io.dddbyexamples.delivery.planning.DeliveryEvents;
+import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicy;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Delivery {
-    private String id;
+    private UUID id;
     private LocalDateTime time;
     private TransportType type;
     private Payload payload;
@@ -15,7 +17,7 @@ public class Delivery {
     private PayloadCapacityPolicy payloadCapacityPolicy;
     private DeliveryEvents events;
 
-    public Delivery(String id, PayloadCapacityPolicy payloadCapacityPolicy, DeliveryEvents events) {
+    public Delivery(UUID id, PayloadCapacityPolicy payloadCapacityPolicy, DeliveryEvents events) {
         this.id = id;
         this.payloadCapacityPolicy = payloadCapacityPolicy;
         this.events = events;
@@ -41,19 +43,19 @@ public class Delivery {
         this.payload = command.getPayload();
 
         if (!diff.isEmpty()) {
-            events.emit(new DeliveredAmountsChanged(id, diff));
+            events.emit(new DeliveredAmountsChanged(id, time, diff));
         }
         return Amounts.empty();
     }
 
-    public void clearDelivery() {
+    public void cancelDelivery() {
         Amounts diff = this.payload.amountOfProducts().negative();
         this.type = TransportType.unspecified();
         this.payload = Payload.empty();
-        events.emit(new DeliveredAmountsChanged(id, diff));
+        events.emit(new DeliveredAmountsChanged(id, time, diff));
     }
 
-    public Object getId() {
+    public UUID getId() {
         return id;
     }
 

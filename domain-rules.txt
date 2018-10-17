@@ -1,25 +1,56 @@
 Domain Rules:
 
 Editing Delivery Plan:
-Transport capacity cannot be exceeded:
-euro palette - defined for transport type,
-cages - size like palette, but 2 can be stocked,
-trailers - 10 in standard 22 palette transport size.
+At end of his work day (around 16:00), Logistician prepares delivery plan
+for next day (plan include night shift of next day).
+Plan for today (including night shift) was prepared day before.
 
+Software supports Logistician while planning, by:
+- checking payload size against Transport Capacity (capacity exceeded),
+- continuously checking Plan Completeness against customers demands for that day.
+
+Transport Capacity:
+each transport type (truck etc.) defines its capacity expressed by
+amount of euro palette fitting in it.
+
+There are 3 different types of Storage Units:
+*euro palette* - capacity defined explicitly for transport type,
+*cages* - with same size like euro palette, but two cages can be stocked one on another,
+so for transport with capacity od 22 euro pallets we can fit 44 cages,
+*trailers* - 10 trailers can be transported in standard 22 palette transport size,
+no other transport types are leveraged for trailers delivery.
+
+Plan Completeness:
 Plan change recalculates plan completeness by taking into account:
-planed deliveries
-current demands in parts amount
-the remainder (not fulfilled demands for product from last plan)
+- parts amound currently planed in deliveries,
+- current demands expressed in parts amount,
+- the remainder (not fulfilled demands for product from last plan).
+
+For each Product following information is configurable:
+- preferred transport type and its capacity,
+- storage unit type used for storage and transport,
+- amount of product per storage unit.
 
 Completing the Plan:
-Before completion, plan should fulfill demands 100%,
+Before completion, plan should fulfill demands.
 In other case, confirmation for each product need to be taken:
 confirm customer acceptance: „deliver part next day” or „reduce todays demand”
-the remainder is left for next plan accordingly
+the remainder is left for next plan accordingly or demands should be adjusted.
 Over planning to 1 full storage unit per transport is acceptable.
 After completing:
-Emails for spedition company with info (arrival time at our location, transport type, delivery location) per spedition company should be send.
-Loading Pick Lists and Schedule
+Emails for each spedition company should be send.
+Email should contain information about each delivery:
+- arrival time at our location,
+- transport type,
+- delivery location.
+Pick Lists and Loading Schedule should be generated for warehous crew.
+
+Preferences per product:
+- storage unit type
+- parts amount per storage unit
+- typical delivery location
+- preferred transport type
+- preferred spedition company
 
 Auto Planning:
 Calculate storage units amount to be delivered based on:
@@ -31,13 +62,5 @@ delivery schema / delivery time
 Splits deliveries
 demanded storage units amount
 transport capacity
-
-Preferences per product:
-storage units type
-parts amount per storage units
-typical delivery location
-typical transport time
-preferred spedition company
-preferred transport type
 
 Delivery schema example: „at day start”, „till 12:00”, „till end of day”, „night shift”

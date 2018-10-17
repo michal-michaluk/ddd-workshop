@@ -27,9 +27,9 @@ public class DeliveryService {
         return exceeded;
     }
 
-    public void clearDelivery(ClearDelivery command) {
+    public void cancelDelivery(CancelDelivery command) {
         Delivery model = repository.get(command.getId());
-        model.clearDelivery();
+        model.cancelDelivery();
         repository.save(model);
     }
 }

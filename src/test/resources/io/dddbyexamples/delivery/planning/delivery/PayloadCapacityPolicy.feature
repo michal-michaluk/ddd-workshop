@@ -11,6 +11,7 @@ Feature: Payload capacity policy
   *trailers* - 10 trailers can be transported in standard 22 palette transport size,
   no other transport types are leveraged for trailers delivery.
 
+
   Scenario: Full truck
     Given "truck" of capacity 22
     Given payload contains 22 palette

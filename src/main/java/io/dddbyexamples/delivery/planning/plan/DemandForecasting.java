@@ -2,6 +2,8 @@ package io.dddbyexamples.delivery.planning.plan;
 
 import io.dddbyexamples.delivery.planning.Amounts;
 
+import java.time.LocalDate;
+
 public interface DemandForecasting {
-    void changeDemands(Amounts change);
+    void adjustDemands(LocalDate date, Amounts demands);
 }

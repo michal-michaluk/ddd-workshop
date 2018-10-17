@@ -1,6 +1,7 @@
 package io.dddbyexamples.delivery.planning.delivery;
 
 import io.dddbyexamples.delivery.planning.Amounts;
+import io.dddbyexamples.delivery.planning.delivery.capacity.StorageUnitsAmount;
 import lombok.Value;
 
 import java.util.Collections;
@@ -38,13 +39,13 @@ public class Payload {
         return new Amounts(amountOfProducts);
     }
 
-    public Amounts amountOfUnitTypes() {
+    public StorageUnitsAmount amountOfUnitTypes() {
         Map<String, Long> amountOfUnits = payload.stream()
                 .collect(Collectors.groupingBy(
                         e -> e.getUnit().getType(),
                         Collectors.summingLong(TransportedProduct::getUnitAmount)
                 ));
-        return new Amounts(amountOfUnits);
+        return new StorageUnitsAmount(amountOfUnits);
     }
 
     @Value

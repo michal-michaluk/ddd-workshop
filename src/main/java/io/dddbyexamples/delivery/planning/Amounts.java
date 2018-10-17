@@ -1,6 +1,7 @@
 package io.dddbyexamples.delivery.planning;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -46,6 +47,12 @@ public class Amounts {
         return amounts.getOrDefault(key, 0L);
     }
 
+    public Amounts with(String key, long amount) {
+        HashMap<String, Long> newAmounts = new HashMap<>(amounts);
+        newAmounts.put(key, amount);
+        return new Amounts(newAmounts);
+    }
+
     public boolean isEmpty() {
         return amounts.isEmpty();
     }
@@ -71,6 +78,15 @@ public class Amounts {
                 )));
     }
 
+    public Amounts filterOut(Set<String> exclude) {
+        return new Amounts(amounts.entrySet().stream()
+                .filter(o -> !exclude.contains(o.getKey()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                )));
+    }
+
     public boolean allMatch(BiPredicate<String, Long> predicate) {
         return amounts.entrySet().stream()
                 .allMatch(e -> predicate.test(e.getKey(), e.getValue()));
@@ -79,4 +95,5 @@ public class Amounts {
     public long sum() {
         return amounts.values().stream().mapToLong(value -> value).sum();
     }
+
 }

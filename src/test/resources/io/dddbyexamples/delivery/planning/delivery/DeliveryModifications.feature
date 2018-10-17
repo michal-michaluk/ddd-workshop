@@ -8,7 +8,7 @@ Feature: Editing Delivery Plan
   - checking payload size against Transport Capacity (capacity exceeded),
   - continuously checking Plan Completeness against customers demands for that day.
 
-  Transport Capacity info:
+  Transport Capacity:
   each transport type (truck etc.) defines its capacity expressed by
   amount of euro palette fitting in it.
 
@@ -19,16 +19,18 @@ Feature: Editing Delivery Plan
   *trailers* - 10 trailers can be transported in standard 22 palette transport size,
   no other transport types are leveraged for trailers delivery.
 
-  Completeness against:
+  Plan Completeness:
   Plan change recalculates plan completeness by taking into account:
-  - currently planed deliveries,
+  - parts amount currently planed in deliveries,
   - current demands expressed in parts amount,
   - the remainder (not fulfilled demands for product from last plan).
 
   For each Product following information is configurable:
   - preferred transport type and its capacity,
-  - storage units used for storage and transport,
+  - storage unit type used for storage and transport,
   - amount of product per storage unit.
+  - typical delivery location
+  - preferred spedition company
 
 
   Background:

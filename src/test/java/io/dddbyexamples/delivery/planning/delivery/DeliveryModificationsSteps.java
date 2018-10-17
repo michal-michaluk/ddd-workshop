@@ -1,11 +1,15 @@
-package io.dddbyexamples.delivery.planning;
+package io.dddbyexamples.delivery.planning.delivery;
 
-import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import io.dddbyexamples.delivery.planning.delivery.*;
-import io.dddbyexamples.delivery.planning.plan.*;
+import io.dddbyexamples.delivery.planning.Amounts;
+import io.dddbyexamples.delivery.planning.DeliveredAmountsChanged;
+import io.dddbyexamples.delivery.planning.DeliveryEvents;
+import io.dddbyexamples.delivery.planning.PlanningCompleted;
+import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicy;
+import io.dddbyexamples.delivery.planning.delivery.capacity.SimplePayloadCapacityPolicy;
+import io.dddbyexamples.delivery.planning.plan.PlanCompleteness;
 import lombok.Data;
 import org.assertj.core.api.Assertions;
 
@@ -22,32 +26,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DeliveryModificationsSteps {
 
-    // objects under test
-    private DeliveryPlan plan;
-    private Map<Object, Delivery> deliveries = new HashMap<>();
-    private PlanCompleteness planCompleteness;
-
     // dependencies
     private PayloadCapacityPolicy payloadCapacityPolicy = new SimplePayloadCapacityPolicy();
-    private CompletenessPolicy completenessPolicy = new SimpleCompletenessPolicy();
-    private DemandForecasting forecasting = change -> {
-    };
 
     // state
+    private LocalDate date = LocalDate.now();
     private Map<String, StorageUnit> storageUnits = new HashMap<>();
 
     // consequences
     private Amounts exceeded = Amounts.empty();
     private DeliveryEvents events = createEventsListener();
     private DeliveredAmountsChanged planChanged;
-    private PlanningCompleted planCompleted;
 
-    @Before
-    public void setUp() throws Exception {
-        plan = new DeliveryPlan(
-                UUID.randomUUID(), planCompleteness, forecasting, completenessPolicy, events
-        );
-    }
+    // objects under test
+    private DeliveryFactory factory = new DeliveryFactory(payloadCapacityPolicy, events);
+    private Map<Object, Delivery> deliveries = new HashMap<>();
+    private PlanCompleteness planCompleteness;
 
     @Given("^(\\d+) pieces of product \"([^\"]*)\" are stored on \"([^\"]*)\"$")
     public void piecesOfProductAreStoredOn(int amount, String refNo, String storageUnitType) throws Throwable {
@@ -56,54 +50,41 @@ public class DeliveryModificationsSteps {
 
     @Given("^customers demands for tomorrow:$")
     public void customersDemandsForTomorrow(List<ExpectedDemand> demands) throws Throwable {
-        Amounts todayDemands = new Amounts(demands.stream().collect(Collectors.toMap(
+        Amounts demandsForDate = new Amounts(demands.stream().collect(Collectors.toMap(
                 ExpectedDemand::getProduct,
                 ExpectedDemand::getAmount
         )));
         this.planCompleteness = new PlanCompleteness(
-                LocalDate.now(), Amounts.empty(), todayDemands, Amounts.empty()
+                date, Amounts.empty(), demandsForDate, Amounts.empty()
         );
     }
 
     @Given("^delivery \"([^\"]*)\" scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
-    public void deliveryWasScheduledAtWithOfCapacity(String id,
-                                                     String time, String transportType,
-                                                     int transportCapacity,
-                                                     List<DeliveryPayload> payload) throws Throwable {
-        Delivery object = createNewDelivery(id);
-        EditDelivery command = createCommand(id,
-                time,
-                transportType,
-                transportCapacity,
-                payload
-        );
-        object.editDelivery(command);
+    public void DeliveryWithAliasWasScheduled(String alias,
+                                              String time, String transportType,
+                                              int transportCapacity,
+                                              List<DeliveryPayload> payload) throws Throwable {
+        scheduleNewDeliveryWithAlias(alias, time, transportType, transportCapacity, payload);
         planChanged = null;
     }
 
     @When("^new delivery is scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
-    public void newDeliveryIsPlannedAtWith(String time, String transportType,
-                                           int transportCapacity, List<DeliveryPayload> payload) throws Throwable {
-        String id = "transport at " + time;
-        Assertions.assertThat(deliveries).doesNotContainKeys(id);
-        Delivery object = createNewDelivery(id);
-        EditDelivery command = createCommand(id,
-                time,
-                transportType,
-                transportCapacity,
-                payload
-        );
-        exceeded = object.editDelivery(command);
+    public void scheduleNewDelivery(String time, String transportType,
+                                    int transportCapacity, List<DeliveryPayload> payload) throws Throwable {
+
+        String alias = "transport at " + date + time;
+        scheduleNewDeliveryWithAlias(alias, time, transportType, transportCapacity, payload);
     }
 
     @When("^new delivery \"([^\"]*)\" is scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
-    public void newDeliveryIsPlannedAtWith(String id,
-                                           String time, String transportType,
-                                           int transportCapacity,
-                                           List<DeliveryPayload> payload) throws Throwable {
-        Delivery object = createNewDelivery(id);
-        EditDelivery command = createCommand(id,
-                time,
+    public void scheduleNewDeliveryWithAlias(String alias,
+                                             String time, String transportType,
+                                             int transportCapacity,
+                                             List<DeliveryPayload> payload) throws Throwable {
+        Assertions.assertThat(deliveries).doesNotContainKeys(alias);
+        Delivery object = createNewDelivery(alias);
+        EditDelivery command = createCommand(object.getId(),
+                LocalDateTime.of(date, LocalTime.parse(time)),
                 transportType,
                 transportCapacity,
                 payload
@@ -112,32 +93,35 @@ public class DeliveryModificationsSteps {
     }
 
     @When("^delivery \"([^\"]*)\" is edited: scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
-    public void editDeliveryIsPlannedAtWith(String id,
-                                            String time, String transportType,
-                                            int transportCapacity,
-                                            List<DeliveryPayload> payload) throws Throwable {
-        EditDelivery command = createCommand(id, time, transportType, transportCapacity, payload);
-        exceeded = deliveries.get(id).editDelivery(command);
+    public void editDelivery(String alias,
+                             String time, String transportType,
+                             int transportCapacity,
+                             List<DeliveryPayload> payload) throws Throwable {
+        Delivery delivery = deliveries.get(alias);
+        EditDelivery command = createCommand(delivery.getId(),
+                LocalDateTime.of(date, LocalTime.parse(time)),
+                transportType,
+                transportCapacity,
+                payload
+        );
+        exceeded = delivery.editDelivery(command);
     }
 
     @When("^delivery \"([^\"]*)\" is cancelled$")
     public void deliveryIsCancelled(String id) throws Throwable {
-        deliveries.get(id).clearDelivery();
+        deliveries.get(id).cancelDelivery();
     }
 
-    private Delivery createNewDelivery(String id) {
-        new DeliveryFactory(payloadCapacityPolicy, events);
-        Delivery object = new Delivery(id, payloadCapacityPolicy, events);
-        deliveries.put(id, object);
+    private Delivery createNewDelivery(String alias) {
+        Delivery object = factory.createBlankDelivery();
+        deliveries.put(alias, object);
+        deliveries.put(object.getId(), object);
         return object;
     }
 
-    private EditDelivery createCommand(String id, String time, String transportType, int transportCapacity, List<DeliveryPayload> payload) {
+    private EditDelivery createCommand(UUID id, LocalDateTime time, String transportType, int transportCapacity, List<DeliveryPayload> payload) {
         return new EditDelivery(id,
-                LocalDateTime.of(
-                        LocalDate.now().plusDays(1),
-                        LocalTime.parse(time)
-                ),
+                time,
                 new TransportType(transportType, transportCapacity),
                 Payload.create(payload.stream().collect(Collectors.toMap(
                         DeliveryPayload::getProduct,
@@ -190,8 +174,6 @@ public class DeliveryModificationsSteps {
 
             @Override
             public void emit(PlanningCompleted event) {
-                planCompleted = event;
-
             }
         };
     }

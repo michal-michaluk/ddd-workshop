@@ -1,6 +1,7 @@
 package io.dddbyexamples.delivery.planning.delivery;
 
 import io.dddbyexamples.delivery.planning.DeliveryEvents;
+import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicy;
 import lombok.AllArgsConstructor;
 
 import java.util.UUID;
@@ -12,7 +13,6 @@ public class DeliveryFactory {
     private DeliveryEvents events;
 
     public Delivery createBlankDelivery() {
-        String id = UUID.randomUUID().toString();
-        return new Delivery(id, payloadCapacityPolicy, events);
+        return new Delivery(UUID.randomUUID(), payloadCapacityPolicy, events);
     }
 }

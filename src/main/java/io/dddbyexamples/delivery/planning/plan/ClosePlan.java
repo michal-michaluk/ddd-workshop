@@ -6,6 +6,7 @@ import java.util.Set;
 
 @Value
 public class ClosePlan {
+    Object id;
     Set<String> reminderForRefNos;
     Set<String> adjustDemandForRefNos;
 

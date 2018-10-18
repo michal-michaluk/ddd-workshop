@@ -17,11 +17,10 @@ public class DeliveryPlan {
     private CompletenessPolicy policy;
     private DeliveryEvents events;
 
-    void close(ClosePlan command) {
+    public void close(ClosePlan command) {
         Amounts demandsDiff = planCompleteness.getDiff();
-        if (!policy.fulfills(demandsDiff, command)) {
-            return;
-        }
+        planMatchesDemand(command, demandsDiff);
+
         Amounts targetDemand = planCompleteness
                 .getPlanned()
                 .filter(command.decisionToAdjustDemands());
@@ -33,5 +32,15 @@ public class DeliveryPlan {
                 .filter(command.decisionToDeliverDiffNextDay())
                 .negative();
         events.emit(new PlanningCompleted(id, forDate, reminder));
+    }
+
+    public Object getId() {
+        return id;
+    }
+
+    private void planMatchesDemand(ClosePlan command, Amounts demandsDiff) {
+        if (!policy.planMatchesDemand(demandsDiff, command)) {
+            throw new PlanNotMatchesDemand(demandsDiff, command);
+        }
     }
 }

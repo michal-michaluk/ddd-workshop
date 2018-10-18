@@ -31,6 +31,7 @@ public class ClosingPlanSteps {
 
     private ArgumentCaptor<PlanningCompleted> planCompleted = ArgumentCaptor.forClass(PlanningCompleted.class);
     private ArgumentCaptor<Amounts> adjustedDemands = ArgumentCaptor.forClass(Amounts.class);
+    private PlanNotMatchesDemand planNotMatchesDemand;
 
     @Given("^customers demands:$")
     public void customersDemands(List<ProductAmount> demands) throws Throwable {
@@ -73,7 +74,12 @@ public class ClosingPlanSteps {
                 new PlanCompleteness(date, planned, demanded, previousReminder),
                 forecasting, policy, events
         );
-        plan.close(new ClosePlan(newReminder, adjustDemands));
+        ClosePlan command = new ClosePlan(plan.getId(), newReminder, adjustDemands);
+        try {
+            plan.close(command);
+        } catch (PlanNotMatchesDemand e) {
+            planNotMatchesDemand = e;
+        }
     }
 
     @Then("^planning is completed$")
@@ -93,6 +99,7 @@ public class ClosingPlanSteps {
     public void planningIsNOTCompleted() throws Throwable {
         Mockito.verifyZeroInteractions(events);
         Mockito.verifyZeroInteractions(forecasting);
+        Assertions.assertThat(planNotMatchesDemand).isNotNull();
     }
 
     @Then("^there was no need for adjusting demands$")

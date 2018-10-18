@@ -4,6 +4,7 @@ import io.dddbyexamples.delivery.planning.Amounts;
 import io.dddbyexamples.delivery.planning.DeliveredAmountsChanged;
 import io.dddbyexamples.delivery.planning.DeliveryEvents;
 import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicy;
+import io.dddbyexamples.delivery.planning.delivery.capacity.StorageUnitsAmount;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,26 +15,26 @@ public class Delivery {
     private TransportType type;
     private Payload payload;
 
-    private PayloadCapacityPolicy payloadCapacityPolicy;
+    private PayloadCapacityPolicy policy;
     private DeliveryEvents events;
 
-    public Delivery(UUID id, PayloadCapacityPolicy payloadCapacityPolicy, DeliveryEvents events) {
+    public Delivery(UUID id,
+                    PayloadCapacityPolicy policy,
+                    DeliveryEvents events) {
         this.id = id;
-        this.payloadCapacityPolicy = payloadCapacityPolicy;
+        this.policy = policy;
         this.events = events;
         time = LocalDateTime.MIN;
         type = TransportType.unspecified();
         payload = Payload.empty();
     }
 
-    public Amounts editDelivery(EditDelivery command) {
-        Amounts exceeded = payloadCapacityPolicy.calculateExceeded(
+    public void editDelivery(EditDelivery command) {
+        StorageUnitsAmount exceeded = policy.calculateExceeded(
                 command.getType(),
                 command.getPayload().amountOfUnitTypes()
         );
-        if (capacity(exceeded)) {
-            return exceeded;
-        }
+        payloadCapacityNotExceeded(exceeded);
 
         Amounts diff = command.getPayload().amountOfProducts()
                 .diff(this.payload.amountOfProducts());
@@ -45,7 +46,6 @@ public class Delivery {
         if (!diff.isEmpty()) {
             events.emit(new DeliveredAmountsChanged(id, time, diff));
         }
-        return Amounts.empty();
     }
 
     public void cancelDelivery() {
@@ -59,7 +59,9 @@ public class Delivery {
         return id;
     }
 
-    private boolean capacity(Amounts exceeded) {
-        return !exceeded.isEmpty();
+    private void payloadCapacityNotExceeded(Amounts exceeded) {
+        if (!exceeded.isEmpty()) {
+            throw new PayloadCapacityExceeded(exceeded);
+        }
     }
 }

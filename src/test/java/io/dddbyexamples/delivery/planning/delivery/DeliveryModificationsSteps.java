@@ -82,14 +82,8 @@ public class DeliveryModificationsSteps {
                                              int transportCapacity,
                                              List<DeliveryPayload> payload) throws Throwable {
         Assertions.assertThat(deliveries).doesNotContainKeys(alias);
-        Delivery object = createNewDelivery(alias);
-        EditDelivery command = createCommand(object.getId(),
-                LocalDateTime.of(date, LocalTime.parse(time)),
-                transportType,
-                transportCapacity,
-                payload
-        );
-        exceeded = object.editDelivery(command);
+        createNewDelivery(alias);
+        editDelivery(alias, time, transportType, transportCapacity, payload);
     }
 
     @When("^delivery \"([^\"]*)\" is edited: scheduled at \"([^\"]*)\" with \"([^\"]*)\" of capacity (\\d+):$")
@@ -104,7 +98,12 @@ public class DeliveryModificationsSteps {
                 transportCapacity,
                 payload
         );
-        exceeded = delivery.editDelivery(command);
+        try {
+            delivery.editDelivery(command);
+            exceeded = Amounts.empty();
+        } catch (PayloadCapacityExceeded e) {
+            exceeded = e.getExceeded();
+        }
     }
 
     @When("^delivery \"([^\"]*)\" is cancelled$")

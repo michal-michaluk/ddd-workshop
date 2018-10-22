@@ -1,2 +1,4 @@
 Feature: Notification about late demand changes
-  demand changes leading for closed plan incompleteness
+
+  Demand changes leading for incompleteness of closed plan
+  should cause alert for employee responsible for delivery plan.

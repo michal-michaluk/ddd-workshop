@@ -1,9 +1,6 @@
 package io.dddbyexamples.delivery.planning;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.LongBinaryOperator;
@@ -96,4 +93,21 @@ public class Amounts {
         return amounts.values().stream().mapToLong(value -> value).sum();
     }
 
+    @Override
+    public String toString() {
+        return "Amounts{" + amounts + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Amounts amounts1 = (Amounts) o;
+        return Objects.equals(amounts, amounts1.amounts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amounts);
+    }
 }

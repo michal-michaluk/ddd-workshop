@@ -6,7 +6,6 @@ import cucumber.api.java.en.When;
 import io.dddbyexamples.delivery.planning.Amounts;
 import io.dddbyexamples.delivery.planning.DeliveryEvents;
 import io.dddbyexamples.delivery.planning.PlanningCompleted;
-import lombok.Value;
 import org.assertj.core.api.Assertions;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -20,11 +19,9 @@ public class ClosingPlanSteps {
     private DemandForecasting forecasting = Mockito.mock(DemandForecasting.class);
     private CompletenessPolicy policy = new SimpleCompletenessPolicy();
     private DeliveryEvents events = Mockito.mock(DeliveryEvents.class);
+    private PlanCompletenessBuilder completeness = new PlanCompletenessBuilder();
 
     private LocalDate date = LocalDate.now();
-    private Amounts demanded = Amounts.empty();
-    private Amounts previousReminder = Amounts.empty();
-    private Amounts planned = Amounts.empty();
 
     private Set<String> newReminder = Collections.emptySet();
     private Set<String> adjustDemands = Collections.emptySet();
@@ -35,26 +32,26 @@ public class ClosingPlanSteps {
 
     @Given("^customers demands:$")
     public void customersDemands(List<ProductAmount> demands) throws Throwable {
-        this.demanded = new Amounts(demands.stream().collect(Collectors.toMap(
+        completeness.demanded(date, new Amounts(demands.stream().collect(Collectors.toMap(
                 ProductAmount::getProduct,
                 ProductAmount::getAmount))
-        );
+        ));
     }
 
     @Given("^reminders from previous day:$")
     public void remindersFromPreviousDay(List<ProductAmount> reminders) throws Throwable {
-        this.previousReminder = new Amounts(reminders.stream().collect(Collectors.toMap(
+        completeness.reminder(date, new Amounts(reminders.stream().collect(Collectors.toMap(
                 ProductAmount::getProduct,
                 ProductAmount::getAmount))
-        );
+        ));
     }
 
     @Given("^amounts delivered according to plan$")
     public void amountsDeliveredAccordingToPlan(List<ProductAmount> planned) throws Throwable {
-        this.planned = new Amounts(planned.stream().collect(Collectors.toMap(
+        completeness.planned(date, new Amounts(planned.stream().collect(Collectors.toMap(
                 ProductAmount::getProduct,
                 ProductAmount::getAmount))
-        );
+        ));
     }
 
     @When("^customer decided to adjust demands for: \"([^\"]*)\"$")
@@ -71,7 +68,7 @@ public class ClosingPlanSteps {
     public void planIsClosing() throws Throwable {
         DeliveryPlan plan = new DeliveryPlan(
                 date, date,
-                new PlanCompleteness(date, planned, demanded, previousReminder),
+                completeness.get(date),
                 forecasting, policy, events
         );
         ClosePlan command = new ClosePlan(plan.getId(), newReminder, adjustDemands);
@@ -126,11 +123,5 @@ public class ClosingPlanSteps {
     public void reminderOfForWasSaved(long amount, String refNo) throws Throwable {
         Assertions.assertThat(planCompleted.getValue().getReminder().get(refNo))
                 .isEqualTo(amount);
-    }
-
-    @Value
-    public static class ProductAmount {
-        String product;
-        Long amount;
     }
 }

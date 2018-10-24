@@ -40,9 +40,9 @@ Feature: Editing Delivery Plan
 
   Scenario: two products can fit single transport
     Given customers demands for tomorrow:
-      | product | amount | deliverySchema |
-      | 3009000 | 2000   | at day start   |
-      | 3009001 | 2000   | at day start   |
+      | product | amount |
+      | 3009000 | 2000   |
+      | 3009001 | 2000   |
     When new delivery is scheduled at "07:00" with "truck" of capacity 33:
       | product | storageUnits |
       | 3009000 | 15           |
@@ -54,8 +54,8 @@ Feature: Editing Delivery Plan
 
   Scenario: delivery exceeded transport capacity
     Given customers demands for tomorrow:
-      | product | amount | deliverySchema |
-      | 3009000 | 4000   | at day start   |
+      | product | amount |
+      | 3009000 | 4000   |
     When new delivery is scheduled at "07:00" with "truck" of capacity 22:
       | product | storageUnits |
       | 3009000 | 27           |
@@ -66,8 +66,8 @@ Feature: Editing Delivery Plan
 
   Scenario: products delivery with two transports
     Given customers demands for tomorrow:
-      | product | amount | deliverySchema |
-      | 3009000 | 4000   | at day start   |
+      | product | amount |
+      | 3009000 | 4000   |
     When new delivery is scheduled at "06:00" with "truck" of capacity 22:
       | product | storageUnits |
       | 3009000 | 22           |
@@ -81,11 +81,26 @@ Feature: Editing Delivery Plan
     And customers demands are fulfilled
 
 
+  Scenario: transport with partial (not full) pallet
+    Given customers demands for tomorrow:
+      | product | amount |
+      | 3009000 | 2000   |
+      | 3009001 | 2100   |
+    When new delivery is scheduled at "07:00" with "truck" of capacity 33:
+      | product | storageUnits | pieces |
+      | 3009000 | 15           |        |
+      | 3009001 | 10           |        |
+      | 3009001 | 1            | 100    |
+    Then plan was changed
+    And Transport capacity is not exceeded
+    And customers demands are fulfilled
+
+
   Scenario: editing previously defined delivery
     Given customers demands for tomorrow:
-      | product | amount | deliverySchema |
-      | 3009000 | 2000   | at day start   |
-      | 3009001 | 2000   | at day start   |
+      | product | amount |
+      | 3009000 | 2000   |
+      | 3009001 | 2000   |
     Given delivery "delivery #1" scheduled at "07:00" with "truck" of capacity 33:
       | product | storageUnits |
       | 3009001 | 10           |
@@ -101,9 +116,9 @@ Feature: Editing Delivery Plan
 
   Scenario: canceling previously defined delivery
     Given customers demands for tomorrow:
-      | product | amount | deliverySchema |
-      | 3009000 | 2000   | at day start   |
-      | 3009001 | 2000   | at day start   |
+      | product | amount |
+      | 3009000 | 2000   |
+      | 3009001 | 2000   |
     Given delivery "delivery #1" scheduled at "07:00" with "truck" of capacity 33:
       | product | storageUnits |
       | 3009001 | 10           |

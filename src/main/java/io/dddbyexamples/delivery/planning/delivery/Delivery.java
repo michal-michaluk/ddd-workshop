@@ -6,13 +6,11 @@ import io.dddbyexamples.delivery.planning.DeliveryEvents;
 import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicy;
 import io.dddbyexamples.delivery.planning.delivery.capacity.StorageUnitsAmount;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Delivery {
     private UUID id;
-    private LocalDateTime time;
-    private TransportType type;
+    private Transport transport;
     private Payload payload;
 
     private PayloadCapacityPolicy policy;
@@ -24,14 +22,13 @@ public class Delivery {
         this.id = id;
         this.policy = policy;
         this.events = events;
-        time = LocalDateTime.MIN;
-        type = TransportType.unspecified();
+        transport = Transport.unspecified();
         payload = Payload.empty();
     }
 
     public void editDelivery(EditDelivery command) {
         StorageUnitsAmount exceeded = policy.calculateExceeded(
-                command.getType(),
+                command.getTransport().getType(),
                 command.getPayload().amountOfUnitTypes()
         );
         payloadCapacityNotExceeded(exceeded);
@@ -39,20 +36,20 @@ public class Delivery {
         Amounts diff = command.getPayload().amountOfProducts()
                 .diff(this.payload.amountOfProducts());
 
-        this.time = command.getTime();
-        this.type = command.getType();
+        this.transport = command.getTransport();
         this.payload = command.getPayload();
 
         if (!diff.isEmpty()) {
-            events.emit(new DeliveredAmountsChanged(id, time, diff));
+            events.emit(new DeliveredAmountsChanged(id, transport, diff));
         }
     }
 
     public void cancelDelivery() {
         Amounts diff = this.payload.amountOfProducts().negative();
-        this.type = TransportType.unspecified();
+        Transport transport = this.transport;
+        this.transport = Transport.unspecified();
         this.payload = Payload.empty();
-        events.emit(new DeliveredAmountsChanged(id, time, diff));
+        events.emit(new DeliveredAmountsChanged(id, transport, diff));
     }
 
     public UUID getId() {

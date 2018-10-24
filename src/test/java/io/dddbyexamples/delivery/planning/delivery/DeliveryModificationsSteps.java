@@ -10,7 +10,7 @@ import io.dddbyexamples.delivery.planning.PlanningCompleted;
 import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicy;
 import io.dddbyexamples.delivery.planning.delivery.capacity.SimplePayloadCapacityPolicy;
 import io.dddbyexamples.delivery.planning.plan.PlanCompleteness;
-import lombok.Data;
+import io.dddbyexamples.delivery.planning.plan.ProductAmount;
 import org.assertj.core.api.Assertions;
 
 import java.time.LocalDate;
@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,11 +48,8 @@ public class DeliveryModificationsSteps {
     }
 
     @Given("^customers demands for tomorrow:$")
-    public void customersDemandsForTomorrow(List<ExpectedDemand> demands) throws Throwable {
-        Amounts demandsForDate = new Amounts(demands.stream().collect(Collectors.toMap(
-                ExpectedDemand::getProduct,
-                ExpectedDemand::getAmount
-        )));
+    public void customersDemandsForTomorrow(List<ProductAmount> demands) throws Throwable {
+        Amounts demandsForDate = ProductAmount.createAmounts(demands);
         this.planCompleteness = new PlanCompleteness(
                 date, Amounts.empty(), demandsForDate, Amounts.empty()
         );
@@ -120,16 +116,13 @@ public class DeliveryModificationsSteps {
 
     private EditDelivery createCommand(UUID id, LocalDateTime time, String transportType, int transportCapacity, List<DeliveryPayload> payload) {
         return new EditDelivery(id,
-                time,
-                new TransportType(transportType, transportCapacity),
-                Payload.create(payload.stream().collect(Collectors.toMap(
-                        DeliveryPayload::getProduct,
-                        DeliveryPayload::getStorageUnits
-                )), storageUnits));
+                new Transport(time, new TransportType(transportType, transportCapacity)),
+                DeliveryPayload.create(payload, storageUnits)
+        );
     }
 
     @Then("^Transport capacity is not exceeded$")
-    public void transportCapacityInNotExceeded() throws Throwable {
+    public void transportCapacityIsNotExceeded() throws Throwable {
         assertThat(exceeded.isEmpty()).isTrue();
     }
 
@@ -177,16 +170,4 @@ public class DeliveryModificationsSteps {
         };
     }
 
-    @Data
-    static class ExpectedDemand {
-        private String product;
-        private long amount;
-        private String deliverySchema;
-    }
-
-    @Data
-    static class DeliveryPayload {
-        private String product;
-        private int storageUnits;
-    }
 }

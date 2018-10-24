@@ -1,17 +1,17 @@
 package io.dddbyexamples.delivery.planning;
 
+import io.dddbyexamples.delivery.planning.delivery.Transport;
 import lombok.Value;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Value
 public class DeliveredAmountsChanged {
     Object id;
-    LocalDateTime time;
+    Transport transport;
     Amounts diff;
 
     public LocalDate getDate() {
-        return time.toLocalDate();
+        return transport.getTime().toLocalDate();
     }
 }

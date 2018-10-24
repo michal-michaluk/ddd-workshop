@@ -2,38 +2,38 @@ Feature: Payload capacity policy
 
   Transport Capacity info:
   each transport type (truck etc.) defines its capacity expressed by
-  amount of euro palette fitting in it.
+  amount of euro pallet fitting in it.
 
   There are 3 different types of Storage Units:
-  *euro palette* - capacity defined explicitly for transport type,
-  *cages* - with same size like euro palette, but two cages can be stocked one on another,
+  *euro pallet* - capacity defined explicitly for transport type,
+  *cages* - with same size like euro pallet, but two cages can be stocked one on another,
   so for transport with capacity od 22 euro pallets we can fit 44 cages,
-  *trailers* - 10 trailers can be transported in standard 22 palette transport size,
+  *trailers* - 10 trailers can be transported in standard 22 pallet transport size,
   no other transport types are leveraged for trailers delivery.
 
 
   Scenario: Full truck
     Given "truck" of capacity 22
-    Given payload contains 22 palette
+    Given payload contains 22 pallets
     When Capacity Policy is checked
     Then capacity is not exceeded
 
 
   Scenario: Full truck, one pallet over capacity
     Given "truck" of capacity 22
-    Given payload contains 23 palette
+    Given payload contains 23 pallets
     When Capacity Policy is checked
-    Then capacity is exceeded with 1 palette
+    Then capacity is exceeded with 1 pallets
 
 
-  Scenario Outline: scenarios for palettes
+  Scenario Outline: scenarios for pallets
     Given "<transport>" of capacity <capacity>
-    Given payload contains <palette> palette
+    Given payload contains <pallets> pallets
     When Capacity Policy is checked
-    Then capacity is exceeded with <overPallets> palette
+    Then capacity is exceeded with <overPallets> pallets
 
     Examples:
-      | transport | capacity | palette | overPallets |
+      | transport | capacity | pallets | overPallets |
       | truck     | 22       | 10      | 0           |
       | truck     | 22       | 22      | 0           |
       | truck     | 22       | 23      | 1           |
@@ -46,16 +46,16 @@ Feature: Payload capacity policy
 
   Scenario Outline: Verify payload capacity policy
     Given "<transport>" of capacity <capacity>
-    Given payload contains <palette> palette
+    Given payload contains <pallets> pallets
     Given payload contains <cages> cages
     Given payload contains <trailers> trailers
     When Capacity Policy is checked
-    Then capacity is exceeded with <overPallets> palette
+    Then capacity is exceeded with <overPallets> pallets
     Then capacity is exceeded with <overCages> cages
     Then capacity is exceeded with <overTrailers> trailers
 
     Examples:
-      | transport | capacity | palette | cages | trailers | overPallets | overCages | overTrailers |
+      | transport | capacity | pallets | cages | trailers | overPallets | overCages | overTrailers |
       # partial payload:
       | truck     | 22       | 10      | 0     | 0        | 0           | 0         | 0            |
       | truck     | 22       | 0       | 20    | 0        | 0           | 0         | 0            |
@@ -86,14 +86,14 @@ Feature: Payload capacity policy
 
   Scenario Outline: 2 cages can be stacked on each other
     Given "truck" of capacity <capacity>
-    Given payload contains <palette> palette
+    Given payload contains <pallets> pallets
     Given payload contains <cages> cages
     When Capacity Policy is checked
-    Then capacity is exceeded with <overPallets> palette
+    Then capacity is exceeded with <overPallets> pallets
     Then capacity is exceeded with <overCages> cages
 
     Examples:
-      | capacity | palette | cages | overPallets | overCages |
+      | capacity | pallets | cages | overPallets | overCages |
       | 10       | 9       | 1     | 0           | 0         |
       | 10       | 10      | 1     | 1           | 1         |
       | 10       | 11      | 1     | 2           | 1         |
@@ -113,16 +113,16 @@ Feature: Payload capacity policy
 
   Scenario Outline: Very limited support for trailers
     Given "<transport>" of capacity <capacity>
-    Given payload contains <palette> palette
+    Given payload contains <pallets> pallets
     Given payload contains <cages> cages
     Given payload contains <trailers> trailers
     When Capacity Policy is checked
-    Then capacity is exceeded with <overPallets> palette
+    Then capacity is exceeded with <overPallets> pallets
     Then capacity is exceeded with <overCages> cages
     Then capacity is exceeded with <overTrailers> trailers
 
     Examples:
-      | transport | capacity | palette | cages | trailers | overPallets | overCages | overTrailers |
+      | transport | capacity | pallets | cages | trailers | overPallets | overCages | overTrailers |
       | truck     | 22       | 0       | 0     | 9        | 0           | 0         | 0            |
       | truck     | 22       | 0       | 0     | 10       | 0           | 0         | 0            |
       | truck     | 22       | 0       | 0     | 11       | 0           | 0         | 1            |

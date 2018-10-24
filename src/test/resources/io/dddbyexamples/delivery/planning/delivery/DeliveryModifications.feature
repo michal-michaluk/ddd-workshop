@@ -10,13 +10,13 @@ Feature: Editing Delivery Plan
 
   Transport Capacity:
   each transport type (truck etc.) defines its capacity expressed by
-  amount of euro palette fitting in it.
+  amount of euro pallet fitting in it.
 
   There are 3 different types of Storage Units:
-  *euro palette* - capacity defined explicitly for transport type,
-  *cages* - with same size like euro palette, but two cages can be stocked one on another,
+  *euro pallet* - capacity defined explicitly for transport type,
+  *cages* - with same size like euro pallet, but two cages can be stocked one on another,
   so for transport with capacity od 22 euro pallets we can fit 44 cages,
-  *trailers* - 10 trailers can be transported in standard 22 palette transport size,
+  *trailers* - 10 trailers can be transported in standard 22 pallet transport size,
   no other transport types are leveraged for trailers delivery.
 
   Plan Completeness:
@@ -34,8 +34,8 @@ Feature: Editing Delivery Plan
 
 
   Background:
-    Given 150 pieces of product "3009000" are stored on "euro pallet"
-    Given 200 pieces of product "3009001" are stored on "euro pallet"
+    Given 150 pieces of product "3009000" are stored on "pallet"
+    Given 200 pieces of product "3009001" are stored on "pallet"
 
 
   Scenario: two products can fit single transport

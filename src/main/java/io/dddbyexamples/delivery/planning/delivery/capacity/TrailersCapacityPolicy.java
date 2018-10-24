@@ -10,7 +10,7 @@ class TrailersCapacityPolicy implements PayloadCapacityPolicy {
 
     @Override
     public StorageUnitsAmount calculateExceeded(TransportType type, StorageUnitsAmount amounts) {
-        long palettes = amounts.getPalette();
+        long palettes = amounts.getPallets();
         long trailers = amounts.getTrailers();
         long cages = amounts.getCages();
 

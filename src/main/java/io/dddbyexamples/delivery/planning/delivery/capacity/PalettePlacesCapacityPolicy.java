@@ -8,11 +8,11 @@ class PalettePlacesCapacityPolicy implements PayloadCapacityPolicy {
         StorageUnitsAmount.Builder exceededAmount = StorageUnitsAmount.builder()
                 .addTrailers(amounts.getTrailers());
 
-        long exceededPlaces = amounts.getPalette()
+        long exceededPlaces = amounts.getPallets()
                 + CagesPlacesCalculation.calculateCagesPlaces(amounts.getCages())
                 - type.getCapacity();
         if (exceededPlaces > 0) {
-            exceededAmount.addPalettes(exceededPlaces, amounts.getPalette());
+            exceededAmount.addPallet(exceededPlaces, amounts.getPallets());
             exceededAmount.addCages(CagesPlacesCalculation.calculateCagesAmountToFreePlaces(amounts.getCages(), exceededPlaces));
         }
         return exceededAmount.build();

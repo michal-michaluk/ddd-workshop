@@ -20,16 +20,16 @@ public class StorageUnitsAmount extends Amounts {
         return new Builder();
     }
 
-    public long getPalette() {
-        return get("palette");
+    public long getPallets() {
+        return get("pallet");
     }
 
     public long getTrailers() {
-        return get("trailers");
+        return get("trailer");
     }
 
     public long getCages() {
-        return get("cages");
+        return get("cage");
     }
 
     public static class Builder {
@@ -39,33 +39,33 @@ public class StorageUnitsAmount extends Amounts {
             return new StorageUnitsAmount(amounts);
         }
 
-        public Builder addPalettes(long amount) {
-            add("palette", amount);
+        public Builder addPallet(long amount) {
+            add("pallet", amount);
             return this;
         }
 
         public Builder addTrailers(long amount) {
-            add("trailers", amount);
+            add("trailer", amount);
             return this;
         }
 
         public Builder addCages(long amount) {
-            add("cages", amount);
+            add("cage", amount);
             return this;
         }
 
-        public Builder addPalettes(long amount, long limit) {
-            add("palette", Math.min(amount, limit));
+        public Builder addPallet(long amount, long limit) {
+            add("pallet", Math.min(amount, limit));
             return this;
         }
 
         public Builder addTrailers(long amount, long limit) {
-            add("trailers", Math.min(amount, limit));
+            add("trailer", Math.min(amount, limit));
             return this;
         }
 
         public Builder addCages(long amount, long limit) {
-            add("cages", Math.min(amount, limit));
+            add("cage", Math.min(amount, limit));
             return this;
         }
 

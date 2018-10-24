@@ -22,18 +22,18 @@ public class PayloadCapacityPolicySteps {
         this.type = new TransportType(type, capacity);
     }
 
-    @Given("^payload contains (\\d+) palette$")
-    public void payloadContainsPalette(long amount) throws Throwable {
-        amounts = amounts.addPalettes(amount);
+    @Given("^payload contains (\\d+) pallets$")
+    public void payloadContainsPallets(long amount) throws Throwable {
+        amounts = amounts.addPallet(amount);
     }
 
     @Given("^payload contains (\\d+) cages$")
-    public void payloadContainsCagesCages(long amount) throws Throwable {
+    public void payloadContainsCages(long amount) throws Throwable {
         amounts = amounts.addCages(amount);
     }
 
     @Given("^payload contains (\\d+) trailers$")
-    public void payloadContainsTrailersTrailers(long amount) throws Throwable {
+    public void payloadContainsTrailers(long amount) throws Throwable {
         amounts = amounts.addTrailers(amount);
     }
 
@@ -48,20 +48,20 @@ public class PayloadCapacityPolicySteps {
                 .isTrue();
     }
 
-    @Then("^capacity is exceeded with (\\d+) palette$")
-    public void capacityIsExceededWithOverPalletsPalette(long amount) throws Throwable {
-        Assertions.assertThat(exceededAmount.getPalette())
+    @Then("^capacity is exceeded with (\\d+) pallets$")
+    public void capacityIsExceededWithOverPallets(long amount) throws Throwable {
+        Assertions.assertThat(exceededAmount.getPallets())
                 .isEqualTo(amount);
     }
 
     @Then("^capacity is exceeded with (\\d+) cages$")
-    public void capacityIsExceededWithOverCagesCages(int amount) throws Throwable {
+    public void capacityIsExceededWithOverCages(int amount) throws Throwable {
         Assertions.assertThat(exceededAmount.getCages())
                 .isEqualTo(amount);
     }
 
     @Then("^capacity is exceeded with (\\d+) trailers$")
-    public void capacityIsExceededWithOverTrailersTrailers(int amount) throws Throwable {
+    public void capacityIsExceededWithOverTrailers(int amount) throws Throwable {
         Assertions.assertThat(exceededAmount.getTrailers())
                 .isEqualTo(amount);
     }

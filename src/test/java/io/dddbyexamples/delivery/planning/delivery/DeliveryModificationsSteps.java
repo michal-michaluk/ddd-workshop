@@ -8,7 +8,7 @@ import io.dddbyexamples.delivery.planning.DeliveredAmountsChanged;
 import io.dddbyexamples.delivery.planning.DeliveryEvents;
 import io.dddbyexamples.delivery.planning.PlanningCompleted;
 import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicy;
-import io.dddbyexamples.delivery.planning.delivery.capacity.SimplePayloadCapacityPolicy;
+import io.dddbyexamples.delivery.planning.delivery.capacity.PayloadCapacityPolicyVer1;
 import io.dddbyexamples.delivery.planning.plan.PlanCompleteness;
 import io.dddbyexamples.delivery.planning.plan.ProductAmount;
 import org.assertj.core.api.Assertions;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DeliveryModificationsSteps {
 
     // dependencies
-    private PayloadCapacityPolicy payloadCapacityPolicy = new SimplePayloadCapacityPolicy();
+    private PayloadCapacityPolicy payloadCapacityPolicy = new PayloadCapacityPolicyVer1();
 
     // state
     private LocalDate date = LocalDate.now();

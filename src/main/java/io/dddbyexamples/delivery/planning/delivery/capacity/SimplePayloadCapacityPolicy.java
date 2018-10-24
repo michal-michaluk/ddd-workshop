@@ -8,7 +8,7 @@ public class SimplePayloadCapacityPolicy implements PayloadCapacityPolicy {
     public StorageUnitsAmount calculateExceeded(TransportType type, StorageUnitsAmount amounts) {
         long exceeded = Math.max(amounts.sum() - type.getCapacity(), 0);
         return StorageUnitsAmount.builder()
-                .addPalettes(exceeded)
+                .addPallet(exceeded)
                 .build();
     }
 }

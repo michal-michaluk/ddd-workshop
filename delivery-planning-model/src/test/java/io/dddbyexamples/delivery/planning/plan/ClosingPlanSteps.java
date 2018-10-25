@@ -88,7 +88,7 @@ public class ClosingPlanSteps {
         Assertions.assertThat(planCompleted.getValue())
                 .isNotNull()
                 .extracting(PlanningCompleted::getDate)
-                .containsOnly(date)
+                .isEqualTo(date)
         ;
     }
 

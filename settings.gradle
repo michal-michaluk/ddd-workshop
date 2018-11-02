@@ -1,2 +1,3 @@
 rootProject.name = 'delivery-planning'
 include "delivery-planning-model"
+include "delivery-planning-adapters"

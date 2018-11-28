@@ -1,2 +1,6 @@
 apply plugin: 'groovy'
 apply plugin: 'jacoco'
+
+dependencies {
+    compile(project(':delivery-planning-model'))
+}

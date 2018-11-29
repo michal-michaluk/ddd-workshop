@@ -15,8 +15,6 @@ class InMemoryPlannedAmounts {
     }
 
     void update(LocalDate date, Amounts diff) {
-        Amounts updatedAmount = this.amounts.computeIfAbsent(date, localDate -> Amounts.empty());
-
-        amounts.put(date, updatedAmount.sum(diff));
+        amounts.merge(date, diff, Amounts::sum);
     }
 }

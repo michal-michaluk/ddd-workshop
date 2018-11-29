@@ -1,5 +1,7 @@
 package io.dddbyexamples.delivery.planning;
 
+import java.util.UUID;
+
 import io.dddbyexamples.delivery.planning.delivery.*;
 import io.dddbyexamples.delivery.planning.plan.ClosePlan;
 import io.dddbyexamples.delivery.planning.plan.DeliveryPlan;
@@ -13,12 +15,13 @@ public class DeliveryPlanningService {
     private final DeliveryRepository deliveries;
     private final PlanRepository plans;
 
-    public void scheduleDelivery(ScheduleDelivery command) {
+    public UUID scheduleDelivery(ScheduleDelivery command) {
         Delivery model = factory.createBlankDelivery();
         model.editDelivery(
                 command.asEditFor(model.getId())
         );
         deliveries.save(model);
+        return model.getId();
     }
 
     public void editDelivery(EditDelivery command) {

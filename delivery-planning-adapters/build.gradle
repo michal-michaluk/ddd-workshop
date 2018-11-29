@@ -3,4 +3,6 @@ apply plugin: 'jacoco'
 
 dependencies {
     compile(project(':delivery-planning-model'))
+    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+
 }

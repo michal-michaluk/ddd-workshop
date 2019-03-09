@@ -13,10 +13,10 @@ public class PlanCompleteness {
     private LocalDate date;
     private Amounts planned;
     private Amounts demanded;
-    private Amounts yesterdaysReminder;
+    private Amounts yesterdaysRemainder;
 
     public Amounts getDiff() {
-        return planned.diff(demanded.sum(yesterdaysReminder));
+        return planned.diff(demanded.sum(yesterdaysRemainder));
     }
 
     public Amounts getPlanned() {
@@ -45,6 +45,6 @@ public class PlanCompleteness {
         if (!event.getDate().equals(date.minusDays(1))) {
             return;
         }
-        yesterdaysReminder = yesterdaysReminder.sum(event.getReminder());
+        yesterdaysRemainder = yesterdaysRemainder.sum(event.getRemainder());
     }
 }

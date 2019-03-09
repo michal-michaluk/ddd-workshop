@@ -27,22 +27,22 @@ public class PlanCompletenessBuilder implements PlanCompletenessProvider {
         parts.computeIfAbsent(date, key -> new Part()).setPlanned(amounts);
     }
 
-    public void reminder(LocalDate date, Amounts amounts) {
-        parts.computeIfAbsent(date, key -> new Part()).setReminder(amounts);
+    public void remainder(LocalDate date, Amounts amounts) {
+        parts.computeIfAbsent(date, key -> new Part()).setRemainder(amounts);
     }
 
     @Data
     private class Part {
         private Amounts planned = Amounts.empty();
         private Amounts demanded = Amounts.empty();
-        private Amounts reminder = Amounts.empty();
+        private Amounts remainder = Amounts.empty();
 
         private PlanCompleteness create(LocalDate key) {
             return new PlanCompleteness(
                     key,
                     planned,
                     demanded,
-                    reminder
+                    remainder
             );
         }
     }

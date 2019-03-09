@@ -28,10 +28,10 @@ public class DeliveryPlan {
             forecasting.adjustDemands(forDate, targetDemand);
         }
 
-        Amounts reminder = demandsDiff
+        Amounts remainder = demandsDiff
                 .filter(command.decisionToDeliverDiffNextDay())
                 .negative();
-        events.emit(new PlanningCompleted(id, forDate, reminder));
+        events.emit(new PlanningCompleted(id, forDate, remainder));
     }
 
     public Object getId() {

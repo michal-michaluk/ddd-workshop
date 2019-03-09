@@ -28,7 +28,7 @@ Feature: Closing Delivery Plan
     When plan is closing
     Then planning is completed
     And there was no need for adjusting demands
-    And there was no need for reminder for next day
+    And there was no need for remainder for next day
 
 
   Scenario: cannot close plan NOT fulfilling demands
@@ -55,10 +55,10 @@ Feature: Closing Delivery Plan
     And plan is closing
     Then planning is completed
     And demand for "3009001" was adjusted to 1800
-    And there was no need for reminder for next day
+    And there was no need for remainder for next day
 
 
-  Scenario: closing plan with reminder for next day
+  Scenario: closing plan with remainder for next day
     Given customers demands:
       | product | amount |
       | 3009000 | 2000   |
@@ -71,7 +71,7 @@ Feature: Closing Delivery Plan
     And plan is closing
     Then planning is completed
     And there was no need for adjusting demands
-    And reminder of 200 for "3009001" was saved
+    And remainder of 200 for "3009001" was saved
 
 
   Scenario: closing plan with multiple different decisions
@@ -91,15 +91,15 @@ Feature: Closing Delivery Plan
     Then planning is completed
     And demand for "3009000" was adjusted to 1800
     And demand for "3009001" was adjusted to 1800
-    And reminder of 200 for "3009002" was saved
+    And remainder of 200 for "3009002" was saved
 
 
-  Scenario: counting previous reminder
+  Scenario: counting previous remainder
     Given customers demands:
       | product | amount |
       | 3009000 | 2000   |
       | 3009001 | 2000   |
-    Given reminders from previous day:
+    Given remainders from previous day:
       | product | amount |
       | 3009000 | 150    |
     Given amounts delivered according to plan

@@ -8,5 +8,5 @@ import java.time.LocalDate;
 public class PlanningCompleted {
     Object id;
     LocalDate date;
-    Amounts reminder;
+    Amounts remainder;
 }

@@ -12,4 +12,4 @@ Feature: Calculation and presentation of Plan Completeness
   So Plan Completeness is recalculated after each event:
   - DeliveredAmountsChanged - influences planned amount in deliveries for a day of planning
   - DemandedLevelsChanged - influences demanded amount for a day of planning
-  - PlanningCompleted - contains optional reminder for next planning day
+  - PlanningCompleted - contains optional remainder for next planning day

@@ -23,7 +23,7 @@ public class ClosingPlanSteps {
 
     private LocalDate date = LocalDate.now();
 
-    private Set<String> newReminder = Collections.emptySet();
+    private Set<String> newRemainder = Collections.emptySet();
     private Set<String> adjustDemands = Collections.emptySet();
 
     private ArgumentCaptor<PlanningCompleted> planCompleted = ArgumentCaptor.forClass(PlanningCompleted.class);
@@ -38,9 +38,9 @@ public class ClosingPlanSteps {
         ));
     }
 
-    @Given("^reminders from previous day:$")
-    public void remindersFromPreviousDay(List<ProductAmount> reminders) throws Throwable {
-        completeness.reminder(date, new Amounts(reminders.stream().collect(Collectors.toMap(
+    @Given("^remainders from previous day:$")
+    public void remaindersFromPreviousDay(List<ProductAmount> remainders) throws Throwable {
+        completeness.remainder(date, new Amounts(remainders.stream().collect(Collectors.toMap(
                 ProductAmount::getProduct,
                 ProductAmount::getAmount))
         ));
@@ -61,7 +61,7 @@ public class ClosingPlanSteps {
 
     @When("^customer decided to deliver missing pieces for next day: \"([^\"]*)\"$")
     public void customerDecidedToDeliverMissingPiecesForNextDay(String refNos) throws Throwable {
-        newReminder = new HashSet<>(Arrays.asList(refNos.split(", ?")));
+        newRemainder = new HashSet<>(Arrays.asList(refNos.split(", ?")));
     }
 
     @When("^plan is closing$")
@@ -71,7 +71,7 @@ public class ClosingPlanSteps {
                 completeness.get(date),
                 forecasting, policy, events
         );
-        ClosePlan command = new ClosePlan(plan.getId(), newReminder, adjustDemands);
+        ClosePlan command = new ClosePlan(plan.getId(), newRemainder, adjustDemands);
         try {
             plan.close(command);
         } catch (PlanNotMatchesDemand e) {
@@ -104,10 +104,10 @@ public class ClosingPlanSteps {
         Mockito.verifyZeroInteractions(forecasting);
     }
 
-    @Then("^there was no need for reminder for next day$")
-    public void thereWasNoNeedForReminderForNextDay() throws Throwable {
+    @Then("^there was no need for remainder for next day$")
+    public void thereWasNoNeedForRemainderForNextDay() throws Throwable {
         planningIsCompleted();
-        Assertions.assertThat(planCompleted.getValue().getReminder().isEmpty())
+        Assertions.assertThat(planCompleted.getValue().getRemainder().isEmpty())
                 .isTrue();
     }
 
@@ -119,9 +119,9 @@ public class ClosingPlanSteps {
                 .isEqualTo(amount);
     }
 
-    @Then("^reminder of (\\d+) for \"([^\"]*)\" was saved$")
-    public void reminderOfForWasSaved(long amount, String refNo) throws Throwable {
-        Assertions.assertThat(planCompleted.getValue().getReminder().get(refNo))
+    @Then("^remainder of (\\d+) for \"([^\"]*)\" was saved$")
+    public void remainderOfForWasSaved(long amount, String refNo) throws Throwable {
+        Assertions.assertThat(planCompleted.getValue().getRemainder().get(refNo))
                 .isEqualTo(amount);
     }
 }

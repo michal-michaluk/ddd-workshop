@@ -7,11 +7,11 @@ import java.util.Set;
 @Value
 public class ClosePlan {
     Object id;
-    Set<String> reminderForRefNos;
+    Set<String> remainderForRefNos;
     Set<String> adjustDemandForRefNos;
 
     public Set<String> decisionToDeliverDiffNextDay() {
-        return reminderForRefNos;
+        return remainderForRefNos;
     }
 
     public Set<String> decisionToAdjustDemands() {
